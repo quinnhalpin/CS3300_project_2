@@ -2,7 +2,7 @@
 <head>
 <title>Quinn Halpin, qmh4</title>
 <script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="http://d3js.org/queue.v1.min.js"></script>
+<script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
 <style>
 	svg { border: solid #ccc 1px; }
 	body { font-family: 'Alegreya Sans', Calibri, sans-serif; }
@@ -11,13 +11,9 @@
 </head>
 <body>
 <div>
-	<p id = "us_gun_map">
-	</p>
-	<p id = "us_population_density">
-	</p>
-	<p id = "linear_regression">
-	</p>
+	<p id = "ball_animation"></p>
 </div>
+<script type = "text/javascript" src = "animation.js"></script>
 <script type="text/javascript">
 	var gun_data;
 	var states;
@@ -141,7 +137,7 @@
  		}
  		
  		else{
- 			console.log(job_title);
+ 			//console.log(job_title);
  			return "unknown";
  		}
  	}
@@ -172,6 +168,7 @@
  		la_2014_data = la_2014;
  		la_2015_data = la_2015;
  		
+ 		spoutBalls(50, "#ball_animation");
  	}
 </script>
 </body>
