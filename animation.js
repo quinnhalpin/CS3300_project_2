@@ -26,13 +26,26 @@ function spoutBalls(n, id){
 		.attr("stroke", "black")
 		.attr("width", 10)
 		.attr("height", 20);
-	var gaussian = d3.randomNormal(0.0, 1.0);
+	var gaussian = d3.randomNormal(4.0, 2.0);
 	var gaussian_arr = [];
+	var dict = {};
+	var arr_dict = [];
 	for (i = 0; i < n; i++){
-		gaussian_arr.push({"cx":30});
+		var rand = Math.round(gaussian());
+		if (dict[rand] == undefined){
+			dict[rand] = 1;
+		}
+		else{
+			dict[rand] = dict[rand] + 1;
+		}
+		arr_dict.push({data:rand, count:dict[rand]});
+		gaussian_arr.push(rand);
 	}
+	var pad = 20;
+	var x_scale = d3.scaleLinear().domain([4*d3.min(gaussian_arr), 4*d3.max(gaussian_arr)])
+			.range([pad,ball_svg_width - pad]);
 	console.log(gaussian_arr);
-	var circles = ball_svg.selectAll("circle").data(gaussian_arr);
+	var circles = ball_svg.selectAll("circle").data(arr_dict.reverse());
 	var i = 0;
 	circles.enter().append("circle").attr("class", "balls_bouncing")
 		.merge(circles)
@@ -51,8 +64,10 @@ function spoutBalls(n, id){
 	    .delay(function(d,i) { return 100*(n-i); })
 	    .on("start", function repeat() {
 	        d3.active(this)
-	            .attr("cy", 380- i)
-	            .attr("cx", 100)
+	            .attr("cy", function(d){
+	            	return 380 - 4*d["count"];})
+	            .attr("cx", function(d){
+	            	return x_scale(4*d["data"]);})
 	        i += 3;
       });
 
