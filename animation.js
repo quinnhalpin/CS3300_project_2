@@ -1,15 +1,3 @@
-function moveDown(){
-	//move down
-	return function(d, index, a){
-		console.log(d)
-		//var interpolate = d3.interpolate(data.x, data.x+10);
-		return function(t){
-			//data.x = interpolate(t);
-			//return data.x + 10;	
-		}
-	}
-}
-
 function spoutBalls(n, id){
 	//produce n balls from a spout that move down 
 	ball_svg_height = 400;
@@ -26,7 +14,7 @@ function spoutBalls(n, id){
 		.attr("stroke", "black")
 		.attr("width", 10)
 		.attr("height", 20);
-	var gaussian = d3.randomNormal(4.0, 2.0);
+	var gaussian = d3.randomNormal(4.0, 3.0);
 	var gaussian_arr = [];
 	var dict = {};
 	var arr_dict = [];
@@ -44,7 +32,6 @@ function spoutBalls(n, id){
 	var pad = 20;
 	var x_scale = d3.scaleLinear().domain([4*d3.min(gaussian_arr), 4*d3.max(gaussian_arr)])
 			.range([pad,ball_svg_width - pad]);
-	console.log(gaussian_arr);
 	var circles = ball_svg.selectAll("circle").data(arr_dict.reverse());
 	var i = 0;
 	circles.enter().append("circle").attr("class", "balls_bouncing")
@@ -70,5 +57,30 @@ function spoutBalls(n, id){
 	            	return x_scale(4*d["data"]);})
 	        i += 3;
       });
+	return ball_svg;
+}
 
+function createTree(svg_id,root_loc, height, width, splits){
+	//create a tree based on the number of splits given
+	if (splits > 1){
+		svg_id.append("line")
+		.attr("class", "estimated")
+		.attr("x1", root_loc.x + 1)
+		.attr("y1", root_loc.y)
+		.attr("x2", root_loc.x - width/2)
+		.attr("y2", root_loc.y + height/4)
+		.style("stroke-width", "5px")
+		.style("stroke", "black");
+
+		svg_id.append("line")
+		.attr("class", "estimated")
+		.attr("x1", root_loc.x - 1)
+		.attr("y1", root_loc.y)
+		.attr("x2", root_loc.x + width/2)
+		.attr("y2", root_loc.y + height/4)
+		.style("stroke-width", "5px")
+		.style("stroke", "black");
+		createTree(svg_id, {"x":root_loc.x - width/2, "y":root_loc.y + height/4}, height/2, width/2, splits/2);
+		createTree(svg_id, {"x":root_loc.x + width/2, "y":root_loc.y + height/4}, height/2, width/2, splits/2);
+	}
 }
