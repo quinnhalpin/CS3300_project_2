@@ -1,12 +1,6 @@
-function spoutBalls(n, id){
+function spoutBalls(n, ball_svg, ball_svg_width, ball_svg_height){
 	//produce n balls from a spout that move down 
-	ball_svg_height = 400;
-	ball_svg_width = 400;
 	
-	var ball_svg = d3.select(id).append("svg")
-	.attr("height", ball_svg_height)
-	.attr("width", ball_svg_width);
-
 	var rect = ball_svg.append("rect")
 		.attr("x", 200)
 		.attr("y", 40)
@@ -14,6 +8,7 @@ function spoutBalls(n, id){
 		.attr("stroke", "black")
 		.attr("width", 10)
 		.attr("height", 20);
+
 	var gaussian = d3.randomNormal(4.0, 3.0);
 	var gaussian_arr = [];
 	var dict = {};
@@ -57,11 +52,21 @@ function spoutBalls(n, id){
 	            	return x_scale(4*d["data"]);})
 	        i += 3;
       });
-	return ball_svg;
 }
 
-function createTree(svg_id,root_loc, height, width, splits){
+var tree_lengthsL = [];
+var tree_lengthsR = [];
+
+var total_tree = {};
+var count = 0;
+
+function createTree(svg_id,root_loc, height, width, splits, tree_struct){
 	//create a tree based on the number of splits given
+	if (splits < 2){
+		total_tree[count] = tree_struct;
+		count += 1;
+		return tree_struct;
+	}
 	if (splits > 1){
 		svg_id.append("line")
 		.attr("class", "estimated")
@@ -80,7 +85,54 @@ function createTree(svg_id,root_loc, height, width, splits){
 		.attr("y2", root_loc.y + height/4)
 		.style("stroke-width", "5px")
 		.style("stroke", "black");
-		createTree(svg_id, {"x":root_loc.x - width/2, "y":root_loc.y + height/4}, height/2, width/2, splits/2);
-		createTree(svg_id, {"x":root_loc.x + width/2, "y":root_loc.y + height/4}, height/2, width/2, splits/2);
+
+		if (tree_struct != undefined){
+			var tree_structL = tree_struct.concat([
+			{"x1":root_loc.x + 1, 
+			"y1" : root_loc.y, 
+			"x2": root_loc.x - width/2, 
+			"y2": root_loc.y + height/4}]);
+
+			var tree_structR = tree_struct.concat([
+			{"x1":root_loc.x - 1, 
+			"y1" : root_loc.y, 
+			"x2": root_loc.x + width/2, 
+			"y2": root_loc.y + height/4}]);
+
+			var tree_struct = tree_struct.concat([
+			{"x1":root_loc.x + 1, 
+			"y1" : root_loc.y, 
+			"x2": root_loc.x - width/2, 
+			"y2": root_loc.y + height/4}]).concat([
+			{"x1":root_loc.x - 1, 
+			"y1" : root_loc.y, 
+			"x2": root_loc.x + width/2, 
+			"y2": root_loc.y + height/4}]);
+		}
+		else{
+			var tree_structL = [
+			{"x1":root_loc.x + 1, 
+			"y1" : root_loc.y, 
+			"x2": root_loc.x - width/2, 
+			"y2": root_loc.y + height/4}];
+
+			var tree_structR = [
+			{"x1":root_loc.x - 1, 
+			"y1" : root_loc.y, 
+			"x2": root_loc.x + width/2, 
+			"y2": root_loc.y + height/4}];
+		}
+		
+		tree_lengthsL = createTree(svg_id, 
+			{"x":root_loc.x - width/2, "y":root_loc.y + height/4}, 
+			height/2, width/2, splits/2, tree_structL);
+		tree_lengthsR = createTree(svg_id, 
+			{"x":root_loc.x + width/2, "y":root_loc.y + height/4}, 
+			height/2, width/2, splits/2, tree_structR);
 	}
+	return tree_lengthsL.concat(tree_lengthsR);
+}
+function createTreeBegin(ball_svg,root_loc, height, width, splits, tree_struct){
+	createTree(ball_svg, root_loc, height, width, splits, tree_struct);
+	return total_tree;	 
 }

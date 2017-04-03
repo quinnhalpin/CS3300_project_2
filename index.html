@@ -168,8 +168,16 @@
  		la_2014_data = la_2014;
  		la_2015_data = la_2015;
  		
- 		var svg_id = spoutBalls(200, "#ball_animation");
- 		createTree(svg_id, {"x": 205, "y": 90}, 200, 200, 10);
+ 		var ball_svg_height = 400;
+		var ball_svg_width = 400;
+		
+		var ball_svg = d3.select("#ball_animation").append("svg")
+		.attr("height", ball_svg_height)
+		.attr("width", ball_svg_width);
+
+		var tree_arr = createTreeBegin(ball_svg, {"x": 205, "y": 90}, 200, 200, 16, []);
+ 		spoutBalls(200, ball_svg, ball_svg_height, ball_svg_width, tree_arr);
+ 		
  	}
 </script>
 </body>
