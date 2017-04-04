@@ -6,7 +6,7 @@ function spoutBalls(n, ball_svg, ball_svg_width, ball_svg_height, tree_arr){
 	var rect = ball_svg.append("rect")
 		.attr("x", 200)
 		.attr("y", 40)
-		.attr("fill", "yellow")
+		.attr("fill", "red")
 		.attr("stroke", "black")
 		.attr("width", 10)
 		.attr("height", 20);
@@ -42,72 +42,8 @@ function spoutBalls(n, ball_svg, ball_svg_width, ball_svg_height, tree_arr){
 	for (j = 0; j < Object.keys(tree_arr).length; j++){
 		pointer[j] = 0;
 	}
-	//console.log(pointer)
-	//console.log(tree_arr)
-	// circles.enter().append("circle").attr("class", "balls_bouncing")
-	// 	.merge(circles)
-	// 	.attr("cx", function(c, i){
-	// 		return 205;
-	// 	})
-	// 	.attr("cy", function(c, i){
-	// 		return 60;
-	// 	})
-	// 	.attr("r", 4)
-	// 	.style("fill", function(c, i) {
-	// 		return "yellow";
-	// 	})
-	// 	.transition()
-	//     .duration(2000)
-	//     .delay(function(d,i) { return 1000*(n-i); })
-	//     .on("start", function repeat() {
-	//     	//console.log(d3.active(this))
-
-	//     	var current = d3.active(this);
-	//     	if (current == null) {
-	//     		current = d3.selectAll("circle");
-	//     		console.log("IN NULL")
-	//     	}
-	//         current.attr("cy", function(d){
-	//             	console.log(d["data"])
-	//             	console.log(pointer[d["data"]])
-	//             	return tree_arr[d["data"]][pointer[d["data"]]]["y1"];
-	//             	//return 
-	//             	//return 380 - 4*d["count"];
-	//             })
-	//             .attr("cx", function(d){
-	//             	return tree_arr[d["data"]][pointer[d["data"]]]["x1"];
-	//             	//return x_scale(4*d["data"]);
-	//    			})
-	//    		.transition()
-	// 		   	.duration(100)
-	// 		   	.delay(100)
-	// 		    .on("start", function ending(){
-	// 		    	d3.active(this).attr("cy", function(d){
-	// 		            	return tree_arr[d["data"]][pointer[d["data"]]]["y2"];
-	// 		            	//return 
-	// 		            	//return 380 - 4*d["count"];
-	// 		        })
-	// 		        .attr("cx", function(d){
-	// 	            	return tree_arr[d["data"]][pointer[d["data"]]]["x2"];
-	// 	            	//return x_scale(4*d["data"]);
-	// 		    })
-			  
-	// 	      })
-	// 		.transition().on("end", function finish(){
-	// 			console.log("here 2")
-	// 			console.log(d3.active(this))
-	// 			id = d3.active(this)["_id"]
-	// 			if (tree_arr[0][pointer[id] + 1] != undefined & tree_arr[0][pointer[id]+1] != null){
-	// 			  	pointer[id] += 1;
-	// 			  	console.log(pointer[id])
-	// 			  	console.log("here")
-	// 			  	repeat();	
-	// 		  }
-	// 		})
-			  
-	//    	})
-	   	moveCircle(arr_dict.reverse(), tree_arr, ball_svg, n);
-	   return tree_arr;	
+	moveCircle(arr_dict, tree_arr, ball_svg, n);
+	return tree_arr;	
 }
 
 var tree_lengthsL = [];
@@ -196,6 +132,7 @@ function createTreeBegin(ball_svg,root_loc, height, width, splits, tree_struct){
 function moveCircle(arr, tree_arr, svg, n){
 	//attempt to move circles in a straight line with transitions
 	var circles = svg.selectAll("circle").data(arr);
+
 	circles.enter().append("circle").attr("class", "balls_bouncing")
 		.merge(circles)
 		.attr("cx", 205)
@@ -206,7 +143,8 @@ function moveCircle(arr, tree_arr, svg, n){
 			return "red";})
 		.transition()
 			.duration(50)
-		    .delay(function(d,i) { return 100*(n-i); })
+		    .delay(function(d,i) { return 10*(n-i); })
+		    .ease(d3.easeLinear)
 		    .on("start", function moveDown() {
 		    	d3.select(this).attr("cy", function(d){
 		    		return tree_arr[d["data"]][0]["y1"];
@@ -216,7 +154,7 @@ function moveCircle(arr, tree_arr, svg, n){
 		       	})
 		       	.transition()
 					.duration(50)
-				    .delay(function(d,i) { return 100*(n-i); })
+				    .delay(function(d,i) { return 10*(n-i); })
 				    .on("start", function moveDown() {
 				    	d3.select(this).attr("cy", function(d){
 				    		return tree_arr[d["data"]][0]["y2"];
@@ -227,7 +165,7 @@ function moveCircle(arr, tree_arr, svg, n){
 		    		})
 		    	.transition()
 					.duration(50)
-				    .delay(function(d,i) { return 100*(n-i); })
+				    .delay(function(d,i) { return 10*(n-i); })
 				    .on("start", function moveDown() {
 				    	d3.select(this).attr("cy", function(d){
 				    		return tree_arr[d["data"]][1]["y2"];
@@ -238,7 +176,7 @@ function moveCircle(arr, tree_arr, svg, n){
 		    		})
 		    	.transition()
 					.duration(50)
-				    .delay(function(d,i) { return 100*(n-i); })
+				    .delay(function(d,i) { return 10*(n-i); })
 				    .on("start", function moveDown() {
 				    	d3.select(this).attr("cy", function(d){
 				    		return tree_arr[d["data"]][2]["y2"];
@@ -249,9 +187,10 @@ function moveCircle(arr, tree_arr, svg, n){
 		    		})
 		    	.transition()
 					.duration(50)
-				    .delay(function(d,i) { return 100*(n-i); })
+					.delay(function(d,i) { return 10*(n-i); })
 				    .on("start", function moveDown() {
-				    	d3.select(this).attr("cy", function(d){
+				    	d3.select(this)
+ 						.attr("cy", function(d){
 				    		return tree_arr[d["data"]][3]["y2"];
 				        })
 				        .attr("cx", function(d){
@@ -260,9 +199,11 @@ function moveCircle(arr, tree_arr, svg, n){
 		    		})
 		    	.transition()
 					.duration(50)
-				    .delay(function(d,i) { return 100*(n-i); })
+				    .delay(function(d,i) { return 10*(n-i); })
 				    .on("start", function moveDown() {
-				    	d3.select(this).attr("cy", 380)
+				    	d3.select(this).attr("cy", function(d){
+				    		return 380 - 4*d["count"];
+				    	})
 		    		})
 		    })
 	    
