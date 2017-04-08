@@ -11,7 +11,8 @@ function spoutBalls(n, ball_svg, ball_svg_width, ball_svg_height, tree_arr, root
 		.attr("width", 10)
 		.attr("height", 20);
 
-	var gaussian = d3.randomUniform(0, 15.0);
+	//var gaussian = d3.randomUniform(0, 15.0);
+	var gaussian = d3.randomNormal(7, 2);
 	var gaussian_arr = [];
 	var dict = {};
 	var arr_dict = [];
