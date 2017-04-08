@@ -1,6 +1,6 @@
 var outside_tree;
 
-function spoutBalls(n, ball_svg, ball_svg_width, ball_svg_height, tree_arr){
+function spoutBalls(n, ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_loc){
 	//produce n balls from a spout that move down 
 	outside_tree = tree_arr;
 	var rect = ball_svg.append("rect")
@@ -42,7 +42,7 @@ function spoutBalls(n, ball_svg, ball_svg_width, ball_svg_height, tree_arr){
 	for (j = 0; j < Object.keys(tree_arr).length; j++){
 		pointer[j] = 0;
 	}
-	moveCircle(arr_dict, tree_arr, ball_svg, n);
+	moveCircle(arr_dict, tree_arr, ball_svg, n, root_loc);
 	return tree_arr;	
 }
 
@@ -65,54 +65,72 @@ function createTree(svg_id,root_loc, height, width, splits, tree_struct){
 		.attr("x1", root_loc.x + 1)
 		.attr("y1", root_loc.y)
 		.attr("x2", root_loc.x - width/2)
-		.attr("y2", root_loc.y + height/4)
+		.attr("y2", root_loc.y + height/4 - 5)
 		.style("stroke-width", "5px")
-		.style("stroke", "black");
+		.style("stroke", "#8a8988");
+
+		svg_id.append("line")
+		.attr("class", "estimated")
+		.attr("x1", root_loc.x - width/2)
+		.attr("y1", root_loc.y + height/4 - 7)
+		.attr("x2", root_loc.x - width/2)
+		.attr("y2", root_loc.y + height/4 - 2)
+		.style("stroke-width", "5px")
+		.style("stroke", "#8a8988");
 
 		svg_id.append("line")
 		.attr("class", "estimated")
 		.attr("x1", root_loc.x - 1)
 		.attr("y1", root_loc.y)
 		.attr("x2", root_loc.x + width/2)
-		.attr("y2", root_loc.y + height/4)
+		.attr("y2", root_loc.y + height/4 - 5)
 		.style("stroke-width", "5px")
-		.style("stroke", "black");
+		.style("stroke", "#8a8988");
+
+		svg_id.append("line")
+		.attr("class", "estimated")
+		.attr("x1", root_loc.x + width/2)
+		.attr("y1", root_loc.y + height/4 - 7)
+		.attr("x2", root_loc.x + width/2)
+		.attr("y2", root_loc.y + height/4 - 2)
+		.style("stroke-width", "5px")
+		.style("stroke", "#8a8988");
 
 		if (tree_struct != undefined){
 			var tree_structL = tree_struct.concat([
 			{"x1":root_loc.x + 1, 
 			"y1" : root_loc.y, 
 			"x2": root_loc.x - width/2, 
-			"y2": root_loc.y + height/4}]);
+			"y2": root_loc.y + height/4 - 5}]);
 
 			var tree_structR = tree_struct.concat([
 			{"x1":root_loc.x - 1, 
 			"y1" : root_loc.y, 
 			"x2": root_loc.x + width/2, 
-			"y2": root_loc.y + height/4}]);
+			"y2": root_loc.y + height/4 - 5}]);
 
 			var tree_struct = tree_struct.concat([
 			{"x1":root_loc.x + 1, 
 			"y1" : root_loc.y, 
 			"x2": root_loc.x - width/2, 
-			"y2": root_loc.y + height/4}]).concat([
+			"y2": root_loc.y + height/4 - 5}]).concat([
 			{"x1":root_loc.x - 1, 
 			"y1" : root_loc.y, 
 			"x2": root_loc.x + width/2, 
-			"y2": root_loc.y + height/4}]);
+			"y2": root_loc.y + height/4 - 5}]);
 		}
 		else{
 			var tree_structL = [
 			{"x1":root_loc.x + 1, 
 			"y1" : root_loc.y, 
 			"x2": root_loc.x - width/2, 
-			"y2": root_loc.y + height/4}];
+			"y2": root_loc.y + height/4 - 5}];
 
 			var tree_structR = [
 			{"x1":root_loc.x - 1, 
 			"y1" : root_loc.y, 
 			"x2": root_loc.x + width/2, 
-			"y2": root_loc.y + height/4}];
+			"y2": root_loc.y + height/4 - 5}];
 		}
 		
 		tree_lengthsL = createTree(svg_id, 
@@ -129,7 +147,7 @@ function createTreeBegin(ball_svg,root_loc, height, width, splits, tree_struct){
 	return total_tree;	 
 }
 
-function moveCircle(arr, tree_arr, svg, n){
+function moveCircle(arr, tree_arr, svg, n, root_loc){
 	//attempt to move circles in a straight line with transitions
 	var circles = svg.selectAll("circle").data(arr);
 
@@ -142,69 +160,43 @@ function moveCircle(arr, tree_arr, svg, n){
 		.style("fill", function(c, i) {
 			return "red";})
 		.transition()
-			.duration(50)
-		    .delay(function(d,i) { return 10*(n-i); })
-		    .ease(d3.easeLinear)
-		    .on("start", function moveDown() {
-		    	d3.select(this).attr("cy", function(d){
-		    		return tree_arr[d["data"]][0]["y1"];
-		        })
-		        .attr("cx", function(d){
-		        	return tree_arr[d["data"]][0]["x1"];   			
-		       	})
-		       	.transition()
-					.duration(50)
-				    .delay(function(d,i) { return 10*(n-i); })
-				    .on("start", function moveDown() {
-				    	d3.select(this).attr("cy", function(d){
-				    		return tree_arr[d["data"]][0]["y2"];
-				        })
-				        .attr("cx", function(d){
-				        	return tree_arr[d["data"]][0]["x2"];   			
-				       	})
-		    		})
-		    	.transition()
-					.duration(50)
-				    .delay(function(d,i) { return 10*(n-i); })
-				    .on("start", function moveDown() {
-				    	d3.select(this).attr("cy", function(d){
-				    		return tree_arr[d["data"]][1]["y2"];
-				        })
-				        .attr("cx", function(d){
-				        	return tree_arr[d["data"]][1]["x2"];   			
-				       	})
-		    		})
-		    	.transition()
-					.duration(50)
-				    .delay(function(d,i) { return 10*(n-i); })
-				    .on("start", function moveDown() {
-				    	d3.select(this).attr("cy", function(d){
-				    		return tree_arr[d["data"]][2]["y2"];
-				        })
-				        .attr("cx", function(d){
-				        	return tree_arr[d["data"]][2]["x2"];   			
-				       	})
-		    		})
-		    	.transition()
-					.duration(50)
-					.delay(function(d,i) { return 10*(n-i); })
-				    .on("start", function moveDown() {
-				    	d3.select(this)
- 						.attr("cy", function(d){
-				    		return tree_arr[d["data"]][3]["y2"];
-				        })
-				        .attr("cx", function(d){
-				        	return tree_arr[d["data"]][3]["x2"];   			
-				       	})
-		    		})
-		    	.transition()
-					.duration(50)
-				    .delay(function(d,i) { return 10*(n-i); })
-				    .on("start", function moveDown() {
-				    	d3.select(this).attr("cy", function(d){
-				    		return 380 - 4*d["count"];
-				    	})
-		    		})
-		    })
-	    
+		.duration(50)
+		.delay(function(d,i) { return 10*(n-i); })
+		.attrTween("cy", function(d){
+			return d3.interpolateNumber(60, tree_arr[d["data"]][0]["y1"]);})
+		.attrTween("cx", function(d){
+			return d3.interpolateNumber(205, tree_arr[d["data"]][0]["x1"]);})
+		.transition()
+		.duration(1000)
+		.delay(function(d,i) { return 50*(n-i); })
+		.attrTween("cy", function(d){
+			return d3.interpolateNumber(tree_arr[d["data"]][0]["y1"], tree_arr[d["data"]][0]["y2"]);})
+		.attrTween("cx", function(d){
+			return d3.interpolateNumber(tree_arr[d["data"]][0]["x1"], tree_arr[d["data"]][0]["x2"]);})
+		.transition()
+		.duration(600)
+		.delay(function(d,i) { return 50*(n-i); })
+		.attrTween("cy", function(d){
+			return d3.interpolateNumber(tree_arr[d["data"]][0]["y2"], tree_arr[d["data"]][1]["y2"]);})
+		.attrTween("cx", function(d){
+			return d3.interpolateNumber(tree_arr[d["data"]][0]["x2"], tree_arr[d["data"]][1]["x2"]);})
+		.transition()
+		.duration(500)
+		.delay(function(d,i) { return 50*(n-i); })
+		.attrTween("cy", function(d){
+			return d3.interpolateNumber(tree_arr[d["data"]][1]["y2"], tree_arr[d["data"]][2]["y2"]);})
+		.attrTween("cx", function(d){
+			return d3.interpolateNumber(tree_arr[d["data"]][1]["x2"], tree_arr[d["data"]][2]["x2"]);})
+		.transition()
+		.duration(200)
+		.delay(function(d,i) { return 40*(n-i); })
+		.attrTween("cy", function(d){
+			return d3.interpolateNumber(tree_arr[d["data"]][2]["y2"], tree_arr[d["data"]][3]["y2"]);})
+		.attrTween("cx", function(d){
+			return d3.interpolateNumber(tree_arr[d["data"]][2]["x2"], tree_arr[d["data"]][3]["x2"]);})
+		.transition()
+		.duration(1500)
+		.delay(function(d,i) { return 40*(n-i); })
+		.attrTween("cy", function(d){
+			return d3.interpolateNumber(tree_arr[d["data"]][3]["y2"], 380 - 4*d["count"]);})
 }
