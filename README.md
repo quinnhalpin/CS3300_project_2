@@ -10,5 +10,9 @@ Sacramento doesn't have details for 2011 so consider shrinking time span
 to 2012 to 2015
 
 
+![Alt text](ImagesForReadme/Selection_330.png)
+
+![Alt text](ImagesForReadme/Selection_329.png)
+
 Sources of Data:
 * http://transparentcalifornia.com/agencies/salaries/#cities
