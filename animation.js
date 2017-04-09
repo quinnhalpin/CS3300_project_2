@@ -219,4 +219,9 @@ function moveCircle(arr, tree_arr, svg, n, root_loc){
 		})
 		.attrTween("cy", function(d){
 			return d3.interpolateNumber(tree_arr[d["data"]][3]["y2"], 380 - 4*d["count"]);})
+		.transition()
+		.delay(function(d,i){ return delay*(i);})
+		.duration(2000)
+		.attrTween("opacity", function(d){
+			return d3.interpolateNumber(100,0);})
 }

@@ -14,133 +14,13 @@
 	<p id = "ball_animation"></p>
 </div>
 <script type = "text/javascript" src = "animation.js"></script>
+<script type = "text/javascript" src = "jobs.js"></script>
 <script type="text/javascript">
-	var gun_data;
-	var states;
-//<----------------------Problem 1--------------------------------------------->
  	var la_2011_data = [];
  	var la_2012_data = [];
  	var la_2013_data = [];
  	var la_2014_data = [];
  	var la_2015_data = [];
-
- 	function findCategory(job_title){
- 		job_title = job_title.toLowerCase();
- 		if (job_title.indexOf("fire") != -1){
- 			return "Fire";
- 		}
- 		else if ((job_title.indexOf("police") != -1) || 
- 			(job_title.indexOf("sherif") != -1) ||
- 			(job_title.indexOf("probation") != -1) ||
- 			(job_title.indexOf("sergeant") != -1)){
- 			return "Police";
- 		}
- 		else if ((job_title.indexOf("mta") != -1) ||
- 			(job_title.indexOf("transit") != -1)){
- 			return "Transit";
- 		}
- 		else if ((job_title.indexOf("anesth") != -1) ||
- 			(job_title.indexOf("medical") != -1) ||
- 			(job_title.indexOf("nurs") != -1) ||
- 			(job_title.indexOf("health") != -1) ||
- 			(job_title.indexOf("physican") != -1) ||
- 			(job_title.indexOf("orthopedic") != -1)||
- 			(job_title.indexOf("pharm") != -1)){
- 			return "Medical";
- 		}
- 		else if ((job_title.indexOf("airport") != -1)){
- 			return "Airport";
- 		}
- 		else if ((job_title.indexOf("animal") != -1)){
- 			return "Animal";
- 		}
- 		else if ((job_title.indexOf("architect") != -1)){
- 			return "Architectural";
- 		}
- 		else if ((job_title.indexOf("court") != -1) ||
- 			(job_title.indexOf("legal") != -1)){
- 			return "Court";
- 		}
- 		else if ((job_title.indexOf("mayor") != -1)){
- 			return "Mayor";
- 		}
- 		else if ((job_title.indexOf("librar") != -1)){
- 			return "Library";
- 		}
- 		else if ((job_title.indexOf("parking") != -1)){
- 			return "Parking";
- 		}
- 		else if ((job_title.indexOf("public works") != -1)
- 			){
- 			return "Public Works";
- 		}
- 		else if ((job_title.indexOf("attorney") != -1)){
- 			return "Attorney";
- 		}
- 		else if ((job_title.indexOf("mechanic") != -1) ||
- 			(job_title.indexOf("automative") != -1)){
- 			return "Automative";
- 		}
- 		else if ((job_title.indexOf("custodian") != -1)){
- 			return "Custodian";
- 		}
- 		else if ((job_title.indexOf("engineer") != -1)||
- 			(job_title.indexOf("electric") != -1) ||
- 			(job_title.indexOf("programmer") != -1) ||
- 			(job_title.indexOf("computer operator") != -1))
- 		{
- 			return "Engineer";
- 		}
- 		else if ((job_title.indexOf("account") != -1)||
- 			(job_title.indexOf("financ") != -1)){
- 			return "Accounting/Finance";
- 		}
- 		else if ((job_title.indexOf("gardener") != -1)){
- 			return "Gardening";
- 		}
- 		else if ((job_title.indexOf("general laborer") != -1)||
- 			(job_title.indexOf("warehouse") != -1)){
- 			return "General Laborer";
- 		}
- 		else if ((job_title.indexOf("food serv") != -1)){
- 			return "Food Service";
- 		}
- 		else if ((job_title.indexOf("clerk") != -1)){
- 			return "Clerk";
- 		}
- 		else if ((job_title.indexOf("porter") != -1)){
- 			return "Porter";
- 		}
- 		else if ((job_title.indexOf("truck driver") != -1)){
- 			return "Transportation";
- 		}
- 		else if ((job_title.indexOf("maintenance") != -1)||
- 			(job_title.indexOf("electric trouble dispatcher")!= -1)||
- 			(job_title.indexOf("sheet metal worker")!= -1) ||
- 			(job_title.indexOf("water service")!= -1) ||
- 			(job_title.indexOf("plumber")!= -1) ||
- 			(job_title.indexOf("water utility")!= -1) ||
- 			(job_title.indexOf("welder")!= -1) ||
- 			(job_title.indexOf("painter")!= -1)||
- 			(job_title.indexOf("equipment operator")!= -1))
- 		{
- 			return "Skilled Operator/Install/Maintain/Repair";
- 		}
- 		else if ((job_title.indexOf("park") != -1)){
- 			return "Porter";
- 		}
- 		//added
- 		else if ((job_title.indexOf("construction") != -1)||
- 			(job_title.indexOf("building repairer") != -1)||
- 			(job_title.indexOf("carpenter") != -1)){
- 			return "Construction";
- 		}
- 		
- 		else{
- 			console.log(job_title);
- 			return "unknown";
- 		}
- 	}
 	
 	function parseRow(row) {
 		// filter out name of person and entries that have no base pay
@@ -148,7 +28,7 @@
 			employee_object = row;
 			delete employee_object["employee_name"];
 			delete employee_object["notes"];
-			employee_object["job_category"] = findCategory(row.job_title);
+			employee_object["job_category"] = findCluster(row.job_title);
 			return employee_object;
 		}
 	}

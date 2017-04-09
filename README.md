@@ -16,3 +16,7 @@ to 2012 to 2015
 
 Sources of Data:
 * http://transparentcalifornia.com/agencies/salaries/#cities
+
+Job Categories Distribution: 
+* https://www.careerwise.mnscu.edu/careers/clusters.html
+
