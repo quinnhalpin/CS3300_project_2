@@ -1,6 +1,14 @@
 var outside_tree;
-
-function spoutBalls(n, ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_loc){
+function determineTreeBox(person, function_arr){
+	//take multiple boolean functions and use them to determine path of person
+	//assume f1 is top tree level, ... fn is bottom
+	//places each person into a category from 0 (on left) to 2^(length(function_arr))-1
+	function_arr = function_arr.reverse();
+	return function_arr.map(function(f,ind) {
+			return f(person)*Math.pow(2,ind)
+		}).reduce(function(x,acc){return acc+x});
+}
+function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_loc, full_data, factor_arr){
 	//produce n balls from a spout that move down 
 	outside_tree = tree_arr;
 	var rect = ball_svg.append("rect")
@@ -11,31 +19,45 @@ function spoutBalls(n, ball_svg, ball_svg_width, ball_svg_height, tree_arr, root
 		.attr("width", 10)
 		.attr("height", 20);
 
-	//var gaussian = d3.randomUniform(0, 15.0);
-	var gaussian = d3.randomNormal(7, 2);
-	var gaussian_arr = [];
+	// var gaussian = d3.randomUniform(0, 15.0);
+	// //var gaussian = d3.randomNormal(7, 2);
+	// var gaussian_arr = [];
+	// var dict = {};
+	//var arr_dict = [];
+	// for (i = 0; i < n; i++){
+	// 	var rand = Math.round(gaussian());
+	// 	if (dict[rand] == undefined){
+	// 		dict[rand] = 1;
+	// 	}
+	// 	else{
+	// 		dict[rand] = dict[rand] + 1;
+	// 	}
+	// 	arr_dict.push({data:rand, count:dict[rand]});
+	// 	gaussian_arr.push(rand);
+	// }
 	var dict = {};
 	var arr_dict = [];
-	for (i = 0; i < n; i++){
-		var rand = Math.round(gaussian());
-		if (dict[rand] == undefined){
-			dict[rand] = 1;
+	var student_results = full_data.map(function(x){
+		var box = determineTreeBox(x, factor_arr);
+		if (dict[box] == undefined){
+			dict[box] = 1;
 		}
 		else{
-			dict[rand] = dict[rand] + 1;
+			dict[box] = dict[box] + 1;
 		}
-		arr_dict.push({data:rand, count:dict[rand]});
-		gaussian_arr.push(rand);
-	}
+		arr_dict.push({data:box, count:dict[box]});
+		return box
+	});
+	console.log(dict)
 	var pad = 20;
-	var x_scale = d3.scaleLinear().domain([4*d3.min(gaussian_arr), 4*d3.max(gaussian_arr)])
+	var x_scale = d3.scaleLinear().domain([4*d3.min(student_results), 4*d3.max(student_results)])
 			.range([pad,ball_svg_width - pad]);
 
 
-	var straight_arr = [];
-	for (i = 0; i < n; i++){
-		straight_arr.push(ball_svg_width/n * i)
-	}
+	// var straight_arr = [];
+	// for (i = 0; i < n; i++){
+	// 	straight_arr.push(ball_svg_width/n * i)
+	// }
 
 	var circles = ball_svg.selectAll("circle").data(arr_dict.reverse());
 	var i = 0;
@@ -43,7 +65,7 @@ function spoutBalls(n, ball_svg, ball_svg_width, ball_svg_height, tree_arr, root
 	for (j = 0; j < Object.keys(tree_arr).length; j++){
 		pointer[j] = 0;
 	}
-	moveCircle(arr_dict, tree_arr, ball_svg, n, root_loc);
+	moveCircle(arr_dict, ball_svg_width, ball_svg_height, tree_arr, ball_svg, full_data.length, root_loc);
 	return tree_arr;	
 }
 
@@ -143,7 +165,8 @@ function createTree(svg_id,root_loc, height, width, splits, tree_struct){
 	}
 	return tree_lengthsL.concat(tree_lengthsR);
 }
-function createTreeBegin(ball_svg,root_loc, height, width, splits, tree_struct){
+function createTreeBegin(ball_svg,root_loc, height, width, splits){
+	var tree_struct = [];
 	createTree(ball_svg, root_loc, height, width, splits, tree_struct);
 	return total_tree;	 
 }
@@ -152,11 +175,12 @@ function dist(x1,y1, x2, y2){
 	return Math.sqrt(Math.pow(x1-x2, 2)+ Math.pow(y1-y2, 2));
 }
 
-function moveCircle(arr, tree_arr, svg, n, root_loc){
+function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root_loc){
 	//attempt to move circles in a straight line with transitions
 	var circles = svg.selectAll("circle").data(arr);
-	var speed = .15;
+	var speed = 1;
 	var delay = 100; 
+	var pad = 20;
 	circles.enter().append("circle").attr("class", "balls_bouncing")
 		.merge(circles)
 		.attr("cx", 205)
@@ -215,10 +239,10 @@ function moveCircle(arr, tree_arr, svg, n, root_loc){
 		.transition()
 		.duration(function(d){
 			return dist(tree_arr[d["data"]][3]["x2"], tree_arr[d["data"]][3]["y2"],
-			tree_arr[d["data"]][3]["x2"], 380 - 4*d["count"])/speed;
+			tree_arr[d["data"]][3]["x2"], ball_svg_height - pad - 4*d["count"])/speed;
 		})
 		.attrTween("cy", function(d){
-			return d3.interpolateNumber(tree_arr[d["data"]][3]["y2"], 380 - 4*d["count"]);})
+			return d3.interpolateNumber(tree_arr[d["data"]][3]["y2"], ball_svg_height - pad - 4*d["count"]);})
 		.transition()
 		.delay(function(d,i){ return delay*(i);})
 		.duration(2000)

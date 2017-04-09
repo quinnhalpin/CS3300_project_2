@@ -12,6 +12,7 @@
 <body>
 <div>
 	<p id = "ball_animation"></p>
+	<div id = "user_input"></div>
 </div>
 <script type = "text/javascript" src = "animation.js"></script>
 <script type = "text/javascript" src = "jobs.js"></script>
@@ -21,7 +22,9 @@
  	var la_2013_data = [];
  	var la_2014_data = [];
  	var la_2015_data = [];
-	
+	var student_math = [];
+	var student_por = [];
+
 	function parseRow(row) {
 		// filter out name of person and entries that have no base pay
 		if (Math.round(Number(row.base_pay)) != 0.){
@@ -33,31 +36,97 @@
 		}
 	}
 
-	d3.queue()
-        .defer(d3.csv, "LA/los-angeles-2011.csv", parseRow)
-        .defer(d3.csv, "LA/los-angeles-2012.csv")
-        .defer(d3.csv, "LA/los-angeles-2013.csv")
-        .defer(d3.csv, "LA/los-angeles-2014.csv")
-        .defer(d3.csv, "LA/los-angeles-2015.csv")
-        .await(load_data);
+	function parseStudentRow(row) {
+		// change all string numbers to numbers
+		// yes = 1
+		// no = 0
+		row.Dalc = Number(row.Dalc);
+		row.Fedu = Number(row.Fedu);
+		row.G1 = Number(row.G1);
+		row.G2 = Number(row.G2);
+		row.G3 = Number(row.G3);
+		row.Medu = Number(row.Medu);
+		row.Walc = Number(row.Walc);
+		row.absences = Number(row.absences);
+		row.activities = (row.activities == "yes") ? 1: 0;
 
-    function load_data(error, la_2011, la_2012, la_2013, la_2014, la_2015){
- 		la_2011_data = la_2011;
- 		la_2012_data = la_2012;
- 		la_2013_data = la_2013;
- 		la_2014_data = la_2014;
- 		la_2015_data = la_2015;
- 		
- 		var ball_svg_height = 400;
+		row.age = Number(row.age);
+		row.failures = Number(row.failures);
+		row.famrel = Number(row.famrel);
+		row.famsup = (row.famsup == "yes") ? 1 : 0;
+		row.higher = (row.higher == "yes") ? 1: 0;
+		row.internet = (row.internet == "yes") ? 1: 0;
+		row.nursery = (row.nursery == "yes") ? 1: 0;
+		row.romantic = (row.romantic == "yes") ? 1: 0;
+		row.schoolsup = (row.schoolsup == "yes") ? 1: 0;
+		
+		row.freetime = Number(row.freetime);
+		row.goout = Number(row.goout);
+		row.health = Number(row.health);
+		row.studytime = Number(row.studytime);
+		row.traveltime = Number(row.traveltime);
+		return row;
+	}
+
+
+	// d3.queue()
+ //        .defer(d3.csv, "LA/los-angeles-2011.csv")
+ //        .defer(d3.csv, "LA/los-angeles-2012.csv")
+ //        .defer(d3.csv, "LA/los-angeles-2013.csv")
+ //        .defer(d3.csv, "LA/los-angeles-2014.csv")
+ //        .defer(d3.csv, "LA/los-angeles-2015.csv", parseRow)
+ //        .await(load_data);
+
+ 	d3.queue()
+        .defer(d3.csv, "student_grades/student-mat.csv", parseStudentRow)
+        .defer(d3.csv, "student_grades/student-por.csv", parseStudentRow)
+        .await(load_data);
+    // function load_data(error, la_2011, la_2012, la_2013, la_2014, la_2015){
+ 		// la_2011_data = la_2011;
+ 		// la_2012_data = la_2012;
+ 		// la_2013_data = la_2013;
+ 		// la_2014_data = la_2014;
+ 		// la_2015_data = la_2015;
+ 	function load_data(error, math, portugal){
+ 		student_math = math;
+ 		student_por = portugal;
+ 		var ball_svg_height = 600;
 		var ball_svg_width = 400;
 		
 		var ball_svg = d3.select("#ball_animation").append("svg")
 		.attr("height", ball_svg_height)
 		.attr("width", ball_svg_width);
 
-		var tree_arr = createTreeBegin(ball_svg, {"x": 205, "y": 80}, 200, 200, 16, []);
- 		spoutBalls(200, ball_svg, ball_svg_height, ball_svg_width, tree_arr, {"x": 205, "y": 90});
+		function hasInternet(person){
+			return person.internet;
+		}
+		function hasRomance(person){
+			return person.romantic;
+		}
+		function isHigher(person){
+			return person.higher;
+		}
+		function hasNursery(person){
+			return person.nursery;
+		}
+		var factor_arr = [hasNursery, hasInternet, hasRomance, isHigher]
+		//(ball_svg,root_loc, height, width, full_data, factor_arr
+		var splits = Math.pow(2,factor_arr.length)
+		var curr_hue = 1;
+ 		d3.select("#user_input").append("input")
+		.attr("type", "range")
+		.attr("min", 0)
+		.attr("max", 1)
+		.attr("step",0.01)
+		.on("input", function(){
+			curr_speed = this.value
+		});
+		d3.select("#user_input").append("text").style("font", "17px times")
+		.text("Speed");
+
+		var tree_arr = createTreeBegin(ball_svg, {"x": 205, "y": 70}, 200, 200, splits);
+ 		spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, {"x": 205, "y": 90},student_math, factor_arr);
  		
- 	}
+ 	}	
 </script>
 </body>

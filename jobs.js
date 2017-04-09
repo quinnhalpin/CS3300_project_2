@@ -141,6 +141,9 @@ function findCluster(job_title){
 	else if ((job_title.indexOf("custodia") != -1)||
 		(job_title.indexOf("customer service") != -1)||
 		(job_title.indexOf("student worker") != -1)||
+		(job_title.indexOf("lifeguard") != -1)||
+		(job_title.indexOf("camp counselor") != -1)||
+		(job_title.indexOf("youth development worker") != -1)||
 		(job_title.indexOf("student professional worker") != -1)||
 		(job_title.indexOf("recreation") != -1) ||
 		(job_title.indexOf("park") != -1) ||
@@ -299,6 +302,7 @@ function findCluster(job_title){
 		(job_title.indexOf("painter") != -1) ||
 		(job_title.indexOf("gallery") != -1) ||
 		(job_title.indexOf("art ") != -1)||
+		(job_title.indexOf("theater	") != -1)||
 		(job_title.indexOf("arts") != -1)||
 		(job_title.indexOf("printing press") != -1)||
 		(job_title.indexOf("pre-press") != -1)||
