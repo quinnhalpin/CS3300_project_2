@@ -14,7 +14,7 @@ function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_lo
 	var rect = ball_svg.append("rect")
 		.attr("x", 200)
 		.attr("y", 40)
-		.attr("fill", "red")
+		.attr("fill", "purple")
 		.attr("stroke", "black")
 		.attr("width", 10)
 		.attr("height", 20);
@@ -90,7 +90,7 @@ function createTree(svg_id,root_loc, height, width, splits, tree_struct){
 		.attr("x2", root_loc.x - width/2)
 		.attr("y2", root_loc.y + height/4 - 5)
 		.style("stroke-width", "5px")
-		.style("stroke", "#8a8988");
+		.style("stroke", "green");
 
 		svg_id.append("line")
 		.attr("class", "estimated")
@@ -99,7 +99,7 @@ function createTree(svg_id,root_loc, height, width, splits, tree_struct){
 		.attr("x2", root_loc.x - width/2)
 		.attr("y2", root_loc.y + height/4 - 2)
 		.style("stroke-width", "5px")
-		.style("stroke", "#8a8988");
+		.style("stroke", "green");
 
 		svg_id.append("line")
 		.attr("class", "estimated")
@@ -108,7 +108,7 @@ function createTree(svg_id,root_loc, height, width, splits, tree_struct){
 		.attr("x2", root_loc.x + width/2)
 		.attr("y2", root_loc.y + height/4 - 5)
 		.style("stroke-width", "5px")
-		.style("stroke", "#8a8988");
+		.style("stroke", "red");
 
 		svg_id.append("line")
 		.attr("class", "estimated")
@@ -117,7 +117,7 @@ function createTree(svg_id,root_loc, height, width, splits, tree_struct){
 		.attr("x2", root_loc.x + width/2)
 		.attr("y2", root_loc.y + height/4 - 2)
 		.style("stroke-width", "5px")
-		.style("stroke", "#8a8988");
+		.style("stroke", "red");
 
 		if (tree_struct != undefined){
 			var tree_structL = tree_struct.concat([
@@ -158,10 +158,10 @@ function createTree(svg_id,root_loc, height, width, splits, tree_struct){
 		
 		tree_lengthsL = createTree(svg_id, 
 			{"x":root_loc.x - width/2, "y":root_loc.y + height/4}, 
-			height/2, width/2, splits/2, tree_structL);
+			2*height/3, width/2, splits/2, tree_structL);
 		tree_lengthsR = createTree(svg_id, 
 			{"x":root_loc.x + width/2, "y":root_loc.y + height/4}, 
-			height/2, width/2, splits/2, tree_structR);
+			2*height/3, width/2, splits/2, tree_structR);
 	}
 	return tree_lengthsL.concat(tree_lengthsR);
 }
@@ -175,10 +175,22 @@ function dist(x1,y1, x2, y2){
 	return Math.sqrt(Math.pow(x1-x2, 2)+ Math.pow(y1-y2, 2));
 }
 
+function addStrings(ball_svg_height, ball_svg_width, tree_arr, svg, question_arr){
+	var pad = 200;
+	for (var i = 0; i < question_arr.length; i++){
+		svg.append("text").style("font", "10px times")
+		.text(question_arr[i])
+		.attr("x", ball_svg_width- pad)
+		.attr("y", tree_arr[0][i]["y1"]);
+	}
+}
+
 function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root_loc){
 	//attempt to move circles in a straight line with transitions
+
 	var circles = svg.selectAll("circle").data(arr);
-	var speed = 1;
+	var speed = .05;
+	var speed_down = .4;
 	var delay = 100; 
 	var pad = 20;
 	circles.enter().append("circle").attr("class", "balls_bouncing")
@@ -188,7 +200,7 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 		.attr("r", 4)
 		.attr("id", function (c,i){ return i})
 		.style("fill", function(c, i) {
-			return "red";})
+			return "purple";})
 		.transition()
 		.duration(function(d){
 			return dist(205, 60, tree_arr[d["data"]][0]["x1"], 
@@ -239,13 +251,15 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 		.transition()
 		.duration(function(d){
 			return dist(tree_arr[d["data"]][3]["x2"], tree_arr[d["data"]][3]["y2"],
-			tree_arr[d["data"]][3]["x2"], ball_svg_height - pad - 4*d["count"])/speed;
+			tree_arr[d["data"]][3]["x2"], ball_svg_height - pad - 4*d["count"])/speed_down;
 		})
 		.attrTween("cy", function(d){
 			return d3.interpolateNumber(tree_arr[d["data"]][3]["y2"], ball_svg_height - pad - 4*d["count"]);})
-		.transition()
-		.delay(function(d,i){ return delay*(i);})
-		.duration(2000)
-		.attrTween("opacity", function(d){
-			return d3.interpolateNumber(100,0);})
+		.attrTween("cx", function(d){
+			return d3.interpolateNumber(tree_arr[d["data"]][3]["x2"], tree_arr[d["data"]][3]["x2"]);})
+		// .transition()
+		// .delay(function(d,i){ return delay*(i);})
+		// .duration(2000)
+		// .attrTween("opacity", function(d){
+		// 	return d3.interpolateNumber(100,0);})
 }
