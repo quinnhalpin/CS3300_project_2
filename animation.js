@@ -36,12 +36,6 @@ function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_lo
 	var x_scale = d3.scaleLinear().domain([4*d3.min(student_results), 4*d3.max(student_results)])
 			.range([pad,ball_svg_width - pad]);
 
-
-	// var straight_arr = [];
-	// for (i = 0; i < n; i++){
-	// 	straight_arr.push(ball_svg_width/n * i)
-	// }
-
 	var circles = ball_svg.selectAll("circle").data(arr_dict.reverse());
 	var i = 0;
 	
