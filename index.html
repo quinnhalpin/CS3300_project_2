@@ -24,6 +24,7 @@
  	var la_2015_data = [];
 	var student_math = [];
 	var student_por = [];
+	var tree_arr = [];
 
 	function parseRow(row) {
 		// filter out name of person and entries that have no base pay
@@ -68,25 +69,36 @@
 		return row;
 	}
 
-
-	// d3.queue()
- //        .defer(d3.csv, "LA/los-angeles-2011.csv")
- //        .defer(d3.csv, "LA/los-angeles-2012.csv")
- //        .defer(d3.csv, "LA/los-angeles-2013.csv")
- //        .defer(d3.csv, "LA/los-angeles-2014.csv")
- //        .defer(d3.csv, "LA/los-angeles-2015.csv", parseRow)
- //        .await(load_data);
-
  	d3.queue()
         .defer(d3.csv, "student_grades/student-mat.csv", parseStudentRow)
         .defer(d3.csv, "student_grades/student-por.csv", parseStudentRow)
         .await(load_data);
-    // function load_data(error, la_2011, la_2012, la_2013, la_2014, la_2015){
- 		// la_2011_data = la_2011;
- 		// la_2012_data = la_2012;
- 		// la_2013_data = la_2013;
- 		// la_2014_data = la_2014;
- 		// la_2015_data = la_2015;
+    
+    function createTreePath(svg, tree_arr){
+    	var path_arr = [];
+    	var pathGenerator = d3.line()
+			.x(function(d){return (d.x)})
+			.y(function(d){return (d.y)});	
+    	for (var i = 0; i < tree_arr.length; i++){
+    		var p = d3.path();
+    		p.moveTo(tree_arr[i][0]["x1"],tree_arr[i][0]["y1"])
+    		var path_data = [];
+    		for (var j = 0; j<tree_arr[i].length-1; j++){
+    			p.lineTo( tree_arr[i][j]["x2"], tree_arr[i][j]["y2"]);
+    			p.lineTo( tree_arr[i][j+1]["x1"], tree_arr[i][j+1]["y1"]);
+    		}
+			p.lineTo(tree_arr[i][tree_arr[i].length-1]["x2"], tree_arr[i][tree_arr[i].length-1]["y2"]);
+    		p = p.toString();
+    		svg_path= svg.append("path").attr("d", p).style("stroke-width", 2)
+            .style("stroke", "steelblue")
+            .style("fill", "none")
+            .style("opacity", 0);
+
+            path_arr.push(svg_path);
+    	}
+    	return path_arr;
+    }	
+
  	function load_data(error, math, portugal){
  		student_math = math;
  		student_por = portugal;
@@ -112,7 +124,7 @@
 		function hasActivites(person){
 			return person.activities;
 		}
-		var factor_arr = [hasActivites, hasInternet, hasRomance, isHigher]
+		var factor_arr = [hasActivites, hasInternet, hasRomance, isHigher, hasNursery]
 		//(ball_svg,root_loc, height, width, full_data, factor_arr
 		var splits = Math.pow(2,factor_arr.length)
 		var curr_hue = 1;
@@ -132,15 +144,15 @@
 				"Does the student do extracurriculars?", 
 				"Does the student have internet?",
 				"Is the student in a romantic relationship?",
-				"Did the student go to higher education?"
+				"Did the student go to higher education?",
+				"Nursery????"
 			]
 		}
-		// speed=d3.select("#user_input").attr("id", "stuff").append("text").style("font", "17px times")
-		// .text("Speed").attr("x", 300).attr("y",300).attr("opacity",1);
 
-		
-		var tree_arr = createTreeBegin(ball_svg, {"x": 205, "y": 70}, 200, 200, splits);
- 		spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, {"x": 205, "y": 90},student_math, factor_arr);
+		var tree_root = {"x": 205, "y": 70};
+		tree_arr = createTreeBegin(ball_svg, tree_root, 200, 200, splits);
+		var paths = createTreePath(ball_svg, tree_arr);
+ 		spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, tree_root,student_math, factor_arr, paths);
  		addStrings(ball_svg_height, ball_svg_width, tree_arr, ball_svg, factor_obj["question_arr"])
  	}	
 </script>
