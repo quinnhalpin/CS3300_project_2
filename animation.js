@@ -166,12 +166,62 @@ function translateAlong(path) {
     };
 }
 
+
+
+function showSign(svg, data, paths){
+	//d3.select("#show_rect").attr("opacity", 1);
+	//d3.select("#rect_text").attr("opacity", 1)
+	//	.text(data);
+	svg.selectAll("circle")
+	.attr("opacity", function(d){
+		return (d.data == data) ? 1 : 0.1;
+	})
+	d3.selectAll(".estimated").attr("opacity",0)
+	string = "path_" + data;
+	// d3.select("#"+string).attr("fill", "yellow").style("opacity",1)
+	for (var i = 0; i < paths.length; i++){
+		paths[i].style("stroke",  function(){
+		return (this.getAttribute("id")== string) ? "yellow": "none";
+		}).style("opacity", function(){
+		return (this.getAttribute("id")== string) ? 1: 0;})
+		.style("stroke-opacity",  1);
+	}
+}
+function hideSign(svg, data, paths){
+	//d3.select("#show_rect").attr("opacity", 0);
+	//d3.select("#rect_text").attr("opacity", 0);
+	svg.selectAll("circle").attr("opacity", 1);
+	d3.selectAll(".estimated").attr("opacity",1);
+	for (var i = 0; i < paths.length; i++){
+		paths[i].style("opacity", 0).style("stroke-opacity",0);;
+	} 
+	// svg.selectAll("")
+	// paths.attr("opacity", function(d){
+	// 	return 1;
+	// })	
+}
 function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root_loc, paths){
 	//attempt to move circles in a straight line with transitions
+	
+	// var rect = svg.append("rect")
+	// 	.attr("id", "show_rect")
+	// 	.attr("x", 400)
+	// 	.attr("y", 40)
+	// 	.attr("fill", "none")
+	// 	.attr("opacity", 0)
+	// 	.attr("stroke", "black")
+	// 	.attr("width", 200)
+	// 	.attr("height", 200);
+	// var text = svg.append("text").style("font", "20px times")
+	// 	.attr("id", "rect_text")
+	// 	.text("stuff")
+	// 	.attr("x", 500)
+	// 	.attr("y", 140)
+	// 	.attr("opacity",0);
 
 	var circles = svg.selectAll("circle").data(arr);
-	var speed = .05;
-	var speed_down = .4;
+	var speed = .1;
+	var speed_down = .5;
 	var delay = 100; 
 	var pad = 20;
 	var toppy = svg.append("path").attr("d", "M 205 60 L " + root_loc.x + " " + root_loc.y);
@@ -180,7 +230,15 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 		.merge(circles)
 		.attr("transform", "translate(205,60)")
 		.attr("r", 4)
-		.attr("id", function (c,i){ return i})
+		.attr("id", function (c,i){ 
+			return c.data;
+		})
+		.on("mouseover", function (c) {
+			showSign(svg, c.data, paths);
+		})
+		.on("mouseout", function (c) {
+			hideSign(svg, c.data, paths);
+		})
 		.style("fill", function(c, i) {
 			return "purple";})
 		.transition()

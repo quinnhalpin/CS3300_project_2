@@ -90,7 +90,9 @@
 			p.lineTo(tree_arr[i][tree_arr[i].length-1]["x2"], tree_arr[i][tree_arr[i].length-1]["y2"]);
     		p = p.toString();
     		svg_path= svg.append("path").attr("d", p).style("stroke-width", 2)
+    		.attr("id", "path_" + i)
             .style("stroke", "steelblue")
+            .style("stroke-width", "5px")
             .style("fill", "none")
             .style("opacity", 0);
 
@@ -153,6 +155,7 @@
 		tree_arr = createTreeBegin(ball_svg, tree_root, 200, 200, splits);
 		var paths = createTreePath(ball_svg, tree_arr);
  		spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, tree_root,student_math, factor_arr, paths);
+ 		
  		addStrings(ball_svg_height, ball_svg_width, tree_arr, ball_svg, factor_obj["question_arr"])
  	}	
 </script>
