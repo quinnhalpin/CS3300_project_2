@@ -48,6 +48,7 @@ var tree_lengthsR = [];
 
 var total_tree = [];
 var count = 0;
+var total = 32;
 
 function createTree(svg_id,root_loc, height, width, splits, tree_struct){
 	//create a tree based on the number of splits given
@@ -56,9 +57,12 @@ function createTree(svg_id,root_loc, height, width, splits, tree_struct){
 		count += 1;
 		return tree_struct;
 	}
+	var half_splits = splits/2 -1
+	var full_splits = splits - 1
 	if (splits > 1){
 		svg_id.append("line")
 		.attr("class", "estimated")
+		.attr("id", "tree"+ 0 + "-" + half_splits)
 		.attr("x1", root_loc.x + 1)
 		.attr("y1", root_loc.y)
 		.attr("x2", root_loc.x - width/2)
@@ -68,6 +72,7 @@ function createTree(svg_id,root_loc, height, width, splits, tree_struct){
 
 		svg_id.append("line")
 		.attr("class", "estimated")
+		.attr("id","tree"+ 0 + "-" + half_splits)
 		.attr("x1", root_loc.x - width/2)
 		.attr("y1", root_loc.y + height/4 - 7)
 		.attr("x2", root_loc.x - width/2)
@@ -75,8 +80,10 @@ function createTree(svg_id,root_loc, height, width, splits, tree_struct){
 		.style("stroke-width", "5px")
 		.style("stroke", "green");
 
+		var median = splits/2 
 		svg_id.append("line")
 		.attr("class", "estimated")
+		.attr("id", "tree"+ median + "-" + full_splits)
 		.attr("x1", root_loc.x - 1)
 		.attr("y1", root_loc.y)
 		.attr("x2", root_loc.x + width/2)
@@ -86,6 +93,7 @@ function createTree(svg_id,root_loc, height, width, splits, tree_struct){
 
 		svg_id.append("line")
 		.attr("class", "estimated")
+		.attr("id", "tree"+ median + "-" + full_splits)
 		.attr("x1", root_loc.x + width/2)
 		.attr("y1", root_loc.y + height/4 - 7)
 		.attr("x2", root_loc.x + width/2)
@@ -166,6 +174,17 @@ function translateAlong(path) {
     };
 }
 
+function determineCategories(data, total){
+	var categories = [];
+	var twos = [];
+	var current  = 0;
+	while (Math.pow(2,current)< data){
+		categories.push(Math.pow(2,current)-1);
+		current += 1;
+	}
+	categories.push(Math.pow(2,current)-1);
+	return categories;
+}
 
 
 function showSign(svg, data, paths){
@@ -176,7 +195,9 @@ function showSign(svg, data, paths){
 	.attr("opacity", function(d){
 		return (d.data == data) ? 1 : 0.1;
 	})
-	d3.selectAll(".estimated").attr("opacity",0)
+	d3.selectAll(".estimated").attr("opacity",0.1)
+
+	d3.selectAll("#tree0-0")
 	string = "path_" + data;
 	// d3.select("#"+string).attr("fill", "yellow").style("opacity",1)
 	for (var i = 0; i < paths.length; i++){
