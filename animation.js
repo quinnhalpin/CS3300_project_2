@@ -1,4 +1,5 @@
 var outside_tree;
+var x_scale;
 function determineTreeBox(person, function_arr){
 	//take multiple boolean functions and use them to determine path of person
 	//assume f1 is top tree level, ... fn is bottom
@@ -33,7 +34,7 @@ function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_lo
 		return box
 	});
 	var pad = 20;
-	var x_scale = d3.scaleLinear().domain([4*d3.min(student_results), 4*d3.max(student_results)])
+	x_scale = d3.scaleLinear().domain([4*d3.min(student_results), 4*d3.max(student_results)])
 			.range([pad,ball_svg_width - pad]);
 
 	var circles = ball_svg.selectAll("circle").data(arr_dict.reverse());
@@ -50,18 +51,28 @@ var total_tree = [];
 var count = 0;
 var total = 32;
 
-function createTree(svg_id,root_loc, height, width, splits, tree_struct){
+function setClasses(line, low, high){
+	var str = "estimated p" + low;
+	for (var i = low + 1; i < high + 1; i++){
+		str += " p";
+		str += i;
+	}
+	line.attr("class", str);
+}
+
+function createTree(svg_id,root_loc, height, width, lower_bound, upper_bound, splits, tree_struct){
 	//create a tree based on the number of splits given
 	if (splits < 2){
 		total_tree[count] = tree_struct;
 		count += 1;
 		return tree_struct;
 	}
+	
 	var half_splits = splits/2 -1
 	var full_splits = splits - 1
+	var middle = (upper_bound + lower_bound - 1)/2;
 	if (splits > 1){
-		svg_id.append("line")
-		.attr("class", "estimated")
+		var long_l = svg_id.append("line")
 		.attr("id", "tree"+ 0 + "-" + half_splits)
 		.attr("x1", root_loc.x + 1)
 		.attr("y1", root_loc.y)
@@ -70,19 +81,21 @@ function createTree(svg_id,root_loc, height, width, splits, tree_struct){
 		.style("stroke-width", "5px")
 		.style("stroke", "green");
 
-		svg_id.append("line")
-		.attr("class", "estimated")
+		setClasses(long_l, lower_bound, middle);
+		
+		var short_l = svg_id.append("line")
 		.attr("id","tree"+ 0 + "-" + half_splits)
 		.attr("x1", root_loc.x - width/2)
 		.attr("y1", root_loc.y + height/4 - 7)
 		.attr("x2", root_loc.x - width/2)
-		.attr("y2", root_loc.y + height/4 - 2)
+		.attr("y2", root_loc.y + height/4 + 2)
 		.style("stroke-width", "5px")
 		.style("stroke", "green");
 
-		var median = splits/2 
-		svg_id.append("line")
-		.attr("class", "estimated")
+		setClasses(short_l, lower_bound, middle);
+		
+		var median = (upper_bound + lower_bound +1)/2 
+		var long_r = svg_id.append("line")
 		.attr("id", "tree"+ median + "-" + full_splits)
 		.attr("x1", root_loc.x - 1)
 		.attr("y1", root_loc.y)
@@ -91,15 +104,20 @@ function createTree(svg_id,root_loc, height, width, splits, tree_struct){
 		.style("stroke-width", "5px")
 		.style("stroke", "red");
 
-		svg_id.append("line")
+		setClasses(long_r, median, upper_bound)
+
+		var short_r = svg_id.append("line")
 		.attr("class", "estimated")
 		.attr("id", "tree"+ median + "-" + full_splits)
 		.attr("x1", root_loc.x + width/2)
 		.attr("y1", root_loc.y + height/4 - 7)
 		.attr("x2", root_loc.x + width/2)
-		.attr("y2", root_loc.y + height/4 - 2)
+		.attr("y2", root_loc.y + height/4 + 2)
 		.style("stroke-width", "5px")
 		.style("stroke", "red");
+
+		setClasses(short_r, median, upper_bound)
+
 
 		if (tree_struct != undefined){
 			var tree_structL = tree_struct.concat([
@@ -140,16 +158,16 @@ function createTree(svg_id,root_loc, height, width, splits, tree_struct){
 		
 		tree_lengthsL = createTree(svg_id, 
 			{"x":root_loc.x - width/2, "y":root_loc.y + height/4}, 
-			2*height/3, width/2, splits/2, tree_structL);
+			2*height/3, width/2, lower_bound, middle, splits/2, tree_structL);
 		tree_lengthsR = createTree(svg_id, 
 			{"x":root_loc.x + width/2, "y":root_loc.y + height/4}, 
-			2*height/3, width/2, splits/2, tree_structR);
+			2*height/3, width/2, median, upper_bound, splits/2, tree_structR);
 	}
 	return tree_lengthsL.concat(tree_lengthsR);
 }
 function createTreeBegin(ball_svg,root_loc, height, width, splits){
 	var tree_struct = [];
-	createTree(ball_svg, root_loc, height, width, splits, tree_struct);
+	createTree(ball_svg, root_loc, height, width, 0, splits-1, splits, tree_struct);
 	return total_tree;	 
 }
 
@@ -187,30 +205,26 @@ function determineCategories(data, total){
 }
 
 
-function showSign(svg, data, paths){
-	//d3.select("#show_rect").attr("opacity", 1);
-	//d3.select("#rect_text").attr("opacity", 1)
-	//	.text(data);
+function showSign(svg, data, paths, tree_arr){
+	l = tree_arr[0].length-1;
+	console.log(tree_arr[data][l]["x2"]);
+	d3.select("#show_rect").attr("opacity", 1).attr("x", function(){
+		return tree_arr[data][l]["x2"] + 50;
+	}).attr("y", 200);;
+	d3.select("#rect_text").attr("opacity", 1).attr("x", function(){
+		return tree_arr[data][l]["x2"] + 90;
+	}).text(data).attr("y", 250);
 	svg.selectAll("circle")
 	.attr("opacity", function(d){
 		return (d.data == data) ? 1 : 0.1;
-	})
-	d3.selectAll(".estimated").attr("opacity",0.1)
-
-	d3.selectAll("#tree0-0")
-	string = "path_" + data;
-	// d3.select("#"+string).attr("fill", "yellow").style("opacity",1)
-	for (var i = 0; i < paths.length; i++){
-		paths[i].style("stroke",  function(){
-		return (this.getAttribute("id")== string) ? "yellow": "none";
-		}).style("opacity", function(){
-		return (this.getAttribute("id")== string) ? 1: 0;})
-		.style("stroke-opacity",  1);
-	}
+	});
+	d3.selectAll(".estimated").attr("opacity",0.1);
+	data_str = ".p" + data;
+	d3.selectAll(data_str).attr("opacity",1);
 }
 function hideSign(svg, data, paths){
-	//d3.select("#show_rect").attr("opacity", 0);
-	//d3.select("#rect_text").attr("opacity", 0);
+	d3.select("#show_rect").attr("opacity", 0);
+	d3.select("#rect_text").attr("opacity", 0);
 	svg.selectAll("circle").attr("opacity", 1);
 	d3.selectAll(".estimated").attr("opacity",1);
 	for (var i = 0; i < paths.length; i++){
@@ -224,21 +238,21 @@ function hideSign(svg, data, paths){
 function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root_loc, paths){
 	//attempt to move circles in a straight line with transitions
 	
-	// var rect = svg.append("rect")
-	// 	.attr("id", "show_rect")
-	// 	.attr("x", 400)
-	// 	.attr("y", 40)
-	// 	.attr("fill", "none")
-	// 	.attr("opacity", 0)
-	// 	.attr("stroke", "black")
-	// 	.attr("width", 200)
-	// 	.attr("height", 200);
-	// var text = svg.append("text").style("font", "20px times")
-	// 	.attr("id", "rect_text")
-	// 	.text("stuff")
-	// 	.attr("x", 500)
-	// 	.attr("y", 140)
-	// 	.attr("opacity",0);
+	var rect = svg.append("rect")
+		.attr("id", "show_rect")
+		.attr("x", 400)
+		.attr("y", 40)
+		.attr("fill", "none")
+		.attr("opacity", 0)
+		.attr("stroke", "black")
+		.attr("width", 200)
+		.attr("height", 200);
+	var text = svg.append("text").style("font", "20px times")
+		.attr("id", "rect_text")
+		.text("stuff")
+		.attr("x", 500)
+		.attr("y", 140)
+		.attr("opacity",0);
 
 	var circles = svg.selectAll("circle").data(arr);
 	var speed = .1;
@@ -255,7 +269,7 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 			return c.data;
 		})
 		.on("mouseover", function (c) {
-			showSign(svg, c.data, paths);
+			showSign(svg, c.data, paths, tree_arr);
 		})
 		.on("mouseout", function (c) {
 			hideSign(svg, c.data, paths);

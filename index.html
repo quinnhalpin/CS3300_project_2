@@ -125,7 +125,9 @@
 		function hasActivites(person){
 			return person.activities;
 		}
-		var factor_arr = [hasActivites, hasInternet, hasRomance, isHigher, hasNursery]
+		// var factor_arr = [hasActivites, hasInternet, hasRomance, isHigher, hasNursery]
+		var factor_arr = [hasActivites, hasInternet, hasRomance]
+		
 		//(ball_svg,root_loc, height, width, full_data, factor_arr
 		var splits = Math.pow(2,factor_arr.length)
 		var curr_hue = 1;
@@ -140,13 +142,20 @@
 		d3.select("#user_input").append("text").style("font", "17px times")
 		.text("Speed");
 
+		// factor_obj = {"factor_arr": factor_arr, 
+		// 	"question_arr": [
+		// 		"Does the student do extracurriculars?", 
+		// 		"Does the student have internet?",
+		// 		"Is the student in a romantic relationship?",
+		// 		"Did the student go to higher education?",
+		// 		"Nursery????"
+		// 	]
+		// }
 		factor_obj = {"factor_arr": factor_arr, 
 			"question_arr": [
 				"Does the student do extracurriculars?", 
 				"Does the student have internet?",
 				"Is the student in a romantic relationship?",
-				"Did the student go to higher education?",
-				"Nursery????"
 			]
 		}
 
@@ -156,6 +165,7 @@
  		spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, tree_root,student_math, factor_arr, paths);
  		
  		addStrings(ball_svg_height, ball_svg_width, tree_arr, ball_svg, factor_obj["question_arr"])
+ 		
  	}	
 </script>
 </body>
