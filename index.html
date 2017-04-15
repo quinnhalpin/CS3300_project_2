@@ -104,7 +104,7 @@
  		student_math = math;
  		student_por = portugal;
  		var ball_svg_height = 600;
-		var ball_svg_width = 600;
+		var ball_svg_width = 800;
 		
 		var ball_svg = d3.select("#ball_animation").append("svg")
 		.attr("height", ball_svg_height)
@@ -125,8 +125,8 @@
 		function hasActivites(person){
 			return person.activities;
 		}
-		// var factor_arr = [hasActivites, hasInternet, hasRomance, isHigher, hasNursery]
 		var factor_arr = [hasActivites, hasInternet, hasRomance]
+		// var factor_arr = [hasActivites, hasInternet, hasRomance]
 		
 		//(ball_svg,root_loc, height, width, full_data, factor_arr
 		var splits = Math.pow(2,factor_arr.length)
@@ -155,16 +155,26 @@
 			"question_arr": [
 				"Does the student do extracurriculars?", 
 				"Does the student have internet?",
-				"Is the student in a romantic relationship?",
+				"Is the student in a romantic relationship?"
+				// "Is the student in a romantic relationship?",
+				// "Did the student go to higher education?",
+				// "Did the student go to nursery school?"
+			],
+			"shortened_arr": [
+				"Extracurriculars",
+				"Internet",
+				"Romantic Relationship"
+				// "Romantic Relationship",	
+				// "Higher Education",
+				// "Nursery School"
 			]
 		}
 
 		var tree_root = {"x": 205, "y": 70};
 		tree_arr = createTreeBegin(ball_svg, tree_root, 200, 200, splits);
 		var paths = createTreePath(ball_svg, tree_arr);
- 		spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, tree_root,student_math, factor_arr, paths);
- 		
- 		addStrings(ball_svg_height, ball_svg_width, tree_arr, ball_svg, factor_obj["question_arr"])
+ 		spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, tree_root,student_math, factor_obj, paths);
+ 		addStrings(ball_svg_height, ball_svg_width, tree_arr, ball_svg, factor_obj["question_arr"]);
  		
  	}	
 </script>

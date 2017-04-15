@@ -9,7 +9,7 @@ function determineTreeBox(person, function_arr){
 			return f(person)*Math.pow(2,ind)
 		}).reduce(function(x,acc){return acc+x});
 }
-function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_loc, full_data, factor_arr, paths){
+function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_loc, full_data, factor_obj, paths){
 	//produce n balls from a spout that move down 
 	outside_tree = tree_arr;
 	var rect = ball_svg.append("rect")
@@ -19,11 +19,21 @@ function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_lo
 		.attr("stroke", "black")
 		.attr("width", 10)
 		.attr("height", 20);
+	paths.forEach(function(path){
+		path.on("mouseover", function () {
+				data = Number(this.id.substring(this.id.indexOf("_") + 1))
+				showSign(ball_svg, data, paths, tree_arr, factor_obj, 1);
+			})
+			.on("mouseout", function () {
+				hideSign(ball_svg, data, paths);
+			})
+	})	
+	
 
 	var dict = {};
 	var arr_dict = [];
 	var student_results = full_data.map(function(x){
-		var box = determineTreeBox(x, factor_arr);
+		var box = determineTreeBox(x, factor_obj.factor_arr);
 		if (dict[box] == undefined){
 			dict[box] = 1;
 		}
@@ -180,7 +190,7 @@ function addStrings(ball_svg_height, ball_svg_width, tree_arr, svg, question_arr
 	for (var i = 0; i < question_arr.length; i++){
 		svg.append("text").style("font", "10px times")
 		.text(question_arr[i])
-		.attr("x", ball_svg_width- pad)
+		.attr("x", ball_svg_width- 1.5*pad)
 		.attr("y", tree_arr[0][i]["y1"]);
 	}
 }
@@ -205,15 +215,38 @@ function determineCategories(data, total){
 }
 
 
-function showSign(svg, data, paths, tree_arr){
+function showSign(svg, data, paths, tree_arr, factor_obj, fromPath){
+	//[showSign] shows the sign that will have the questions in it
 	l = tree_arr[0].length-1;
-	console.log(tree_arr[data][l]["x2"]);
-	d3.select("#show_rect").attr("opacity", 1).attr("x", function(){
-		return tree_arr[data][l]["x2"] + 50;
-	}).attr("y", 200);;
-	d3.select("#rect_text").attr("opacity", 1).attr("x", function(){
-		return tree_arr[data][l]["x2"] + 90;
-	}).text(data).attr("y", 250);
+
+	var text = svg.append("text").style("font", "20px times")
+		.attr("id", "rect_text")
+		.html("")
+		.style("font", "14px times")
+		.attr("x", function(){
+		return (fromPath) ? tree_arr[data][l]["x2"] :  tree_arr[data][l]["x2"] + 70;})
+		.attr("y", 250);
+	var d = data;
+	for (var i = 0; i < factor_obj.shortened_arr.length; i++){
+		//begin at first question
+		var opp_i = factor_obj.shortened_arr.length - 1 - i; 
+		if (d >= Math.pow(2,opp_i)){
+			d -= Math.pow(2,opp_i);
+			text.append("tspan")
+   				.attr("dy", 20)
+   				.attr("x",function(){
+    				return tree_arr[data][l]["x2"] + 70;})
+    			.text(function() {return factor_obj.shortened_arr[i] + ": No"});
+		}
+		else{
+			text.append("tspan")
+   				.attr("dy", 20)
+   				.attr("x",function(){
+    				return tree_arr[data][l]["x2"] + 70;})
+    			.text(function() {return factor_obj.shortened_arr[i] + ": Yes"});
+			
+		}
+	}
 	svg.selectAll("circle")
 	.attr("opacity", function(d){
 		return (d.data == data) ? 1 : 0.1;
@@ -221,19 +254,19 @@ function showSign(svg, data, paths, tree_arr){
 	d3.selectAll(".estimated").attr("opacity",0.1);
 	data_str = ".p" + data;
 	d3.selectAll(data_str).attr("opacity",1);
+
+	d3.select("#show_rect").attr("opacity", 1).attr("x", function(){
+		return (fromPath) ? tree_arr[data][l]["x2"] + 50 : tree_arr[data][l]["x2"] + 50;
+	}).attr("y", 200);;
 }
 function hideSign(svg, data, paths){
 	d3.select("#show_rect").attr("opacity", 0);
-	d3.select("#rect_text").attr("opacity", 0);
+	d3.select("#rect_text").remove();
 	svg.selectAll("circle").attr("opacity", 1);
 	d3.selectAll(".estimated").attr("opacity",1);
 	for (var i = 0; i < paths.length; i++){
 		paths[i].style("opacity", 0).style("stroke-opacity",0);;
 	} 
-	// svg.selectAll("")
-	// paths.attr("opacity", function(d){
-	// 	return 1;
-	// })	
 }
 function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root_loc, paths){
 	//attempt to move circles in a straight line with transitions
@@ -242,17 +275,12 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 		.attr("id", "show_rect")
 		.attr("x", 400)
 		.attr("y", 40)
-		.attr("fill", "none")
+		.attr("fill", "#F4EDE3")
 		.attr("opacity", 0)
 		.attr("stroke", "black")
 		.attr("width", 200)
 		.attr("height", 200);
-	var text = svg.append("text").style("font", "20px times")
-		.attr("id", "rect_text")
-		.text("stuff")
-		.attr("x", 500)
-		.attr("y", 140)
-		.attr("opacity",0);
+	
 
 	var circles = svg.selectAll("circle").data(arr);
 	var speed = .1;
@@ -269,7 +297,7 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 			return c.data;
 		})
 		.on("mouseover", function (c) {
-			showSign(svg, c.data, paths, tree_arr);
+			showSign(svg, c.data, paths, tree_arr, factor_obj,0);
 		})
 		.on("mouseout", function (c) {
 			hideSign(svg, c.data, paths);
