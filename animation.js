@@ -1,5 +1,8 @@
 var outside_tree;
 var x_scale;
+var grades_1;
+var after_transition = false;
+var grades_per_category = [];
 function determineTreeBox(person, function_arr){
 	//take multiple boolean functions and use them to determine path of person
 	//assume f1 is top tree level, ... fn is bottom
@@ -11,10 +14,13 @@ function determineTreeBox(person, function_arr){
 }
 function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_loc, full_data, factor_obj, paths){
 	//produce n balls from a spout that move down 
+	// console.log(factor_obj)
 	outside_tree = tree_arr;
+	g_ball_svg = ball_svg;
 	var rect = ball_svg.append("rect")
 		.attr("x", 200)
 		.attr("y", 40)
+		.attr("id", "spout")
 		.attr("fill", "purple")
 		.attr("stroke", "black")
 		.attr("width", 10)
@@ -30,27 +36,39 @@ function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_lo
 	})	
 	
 
-	var dict = {};
-	var arr_dict = [];
+	var attrib_intersect = [];
+	var circle_data = [];
+	grades_1 = full_data.map(function(d){
+		return d.G1;
+	})
+	
 	var student_results = full_data.map(function(x){
-		var box = determineTreeBox(x, factor_obj.factor_arr);
-		if (dict[box] == undefined){
-			dict[box] = 1;
+		var category = determineTreeBox(x, factor_obj.factor_arr);
+		// console.log(category);
+
+		if(!grades_per_category[category]) {
+			grades_per_category[category] = [];	
 		}
-		else{
-			dict[box] = dict[box] + 1;
-		}
-		arr_dict.push({data:box, count:dict[box]});
-		return box
+		var grade_for_x = x.G1;
+		grades_per_category[category][grade_for_x] = grades_per_category[category][grade_for_x] ?  
+		grades_per_category[category][grade_for_x] + 1 : 1;
+
+		attrib_intersect[category] = attrib_intersect[category] ? attrib_intersect[category] + 1 : 1;
+
+		circle_data.push({data:category, count:attrib_intersect[category], "grade": x.G1});
+		return category;
 	});
+	console.log(circle_data)
+	// console.log("Grades per category ")
+	// console.log( grades_per_category)
 	var pad = 20;
 	x_scale = d3.scaleLinear().domain([4*d3.min(student_results), 4*d3.max(student_results)])
 			.range([pad,ball_svg_width - pad]);
 
-	var circles = ball_svg.selectAll("circle").data(arr_dict.reverse());
+	var circles = ball_svg.selectAll("circle").data(circle_data.reverse());
 	var i = 0;
-	
-	moveCircle(arr_dict, ball_svg_width, ball_svg_height, tree_arr, ball_svg, full_data.length, root_loc, paths);
+	// console.log(factor_obj)
+	moveCircle(circle_data, ball_svg_width, ball_svg_height, tree_arr, ball_svg, full_data.length, root_loc, paths, factor_obj);
 	return tree_arr;	
 }
 
@@ -177,6 +195,7 @@ function createTree(svg_id,root_loc, height, width, lower_bound, upper_bound, sp
 }
 function createTreeBegin(ball_svg,root_loc, height, width, splits){
 	var tree_struct = [];
+	g_ball_svg = ball_svg;
 	createTree(ball_svg, root_loc, height, width, 0, splits-1, splits, tree_struct);
 	return total_tree;	 
 }
@@ -219,76 +238,75 @@ function showSign(svg, data, paths, tree_arr, factor_obj, fromPath){
 	//[showSign] shows the sign that will have the questions in it
 	l = tree_arr[0].length-1;
 
+	var rect = svg.append("rect")
+		.attr("id", "show_rect")
+		.attr("x", function(){
+			return (after_transition) ? 450: (fromPath) ? tree_arr[data][l]["x2"] + 50 : tree_arr[data][l]["x2"] + 50;})
+		.attr("y", function() { return after_transition ? 25: 200})
+		.attr("fill", "#F4EDE3")
+		.attr("opacity", 1)
+		.attr("stroke", "black")
+		.attr("width", 200)
+		.attr("height", 200);
 	var text = svg.append("text").style("font", "20px times")
 		.attr("id", "rect_text")
 		.html("")
 		.style("font", "14px times")
 		.attr("x", function(){
 		return (fromPath) ? tree_arr[data][l]["x2"] :  tree_arr[data][l]["x2"] + 70;})
-		.attr("y", 250);
+		.attr("y", function() { return after_transition ? 50: 250});
 	var d = data;
 	for (var i = 0; i < factor_obj.shortened_arr.length; i++){
 		//begin at first question
 		var opp_i = factor_obj.shortened_arr.length - 1 - i; 
-		if (d >= Math.pow(2,opp_i)){
-			d -= Math.pow(2,opp_i);
-			text.append("tspan")
-   				.attr("dy", 20)
-   				.attr("x",function(){
-    				return tree_arr[data][l]["x2"] + 70;})
-    			.text(function() {return factor_obj.shortened_arr[i] + ": No"});
-		}
-		else{
-			text.append("tspan")
-   				.attr("dy", 20)
-   				.attr("x",function(){
-    				return tree_arr[data][l]["x2"] + 70;})
-    			.text(function() {return factor_obj.shortened_arr[i] + ": Yes"});
-			
-		}
+
+		text.append("tspan")
+			.attr("dy", 20)
+			.attr("x",function(){
+				return (after_transition) ? 480 :tree_arr[data][l]["x2"] + 70;})
+			.text(function() {
+				var factor_str = factor_obj.shortened_arr[i];
+				if (d>= Math.pow(2,opp_i)){
+					d -= Math.pow(2,opp_i);
+					factor_str += ": No";
+				} else{
+					factor_str  += ": Yes";
+				}
+				return factor_str;
+			});		
 	}
 	svg.selectAll("circle")
 	.attr("opacity", function(d){
-		return (d.data == data) ? 1 : 0.1;
+		return  (d.data == data) ? 1 : .1;
 	});
 	d3.selectAll(".estimated").attr("opacity",0.1);
 	data_str = ".p" + data;
 	d3.selectAll(data_str).attr("opacity",1);
-
-	d3.select("#show_rect").attr("opacity", 1).attr("x", function(){
-		return (fromPath) ? tree_arr[data][l]["x2"] + 50 : tree_arr[data][l]["x2"] + 50;
-	}).attr("y", 200);;
 }
 function hideSign(svg, data, paths){
-	d3.select("#show_rect").attr("opacity", 0);
+
+	d3.select("#show_rect").remove();
 	d3.select("#rect_text").remove();
-	svg.selectAll("circle").attr("opacity", 1);
+	svg.selectAll("circle").attr("opacity", function(){return (after_transition == true) ? 1:1});
 	d3.selectAll(".estimated").attr("opacity",1);
 	for (var i = 0; i < paths.length; i++){
 		paths[i].style("opacity", 0).style("stroke-opacity",0);;
 	} 
 }
-function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root_loc, paths){
+
+function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root_loc, paths, factor_obj){
 	//attempt to move circles in a straight line with transitions
-	
-	var rect = svg.append("rect")
-		.attr("id", "show_rect")
-		.attr("x", 400)
-		.attr("y", 40)
-		.attr("fill", "#F4EDE3")
-		.attr("opacity", 0)
-		.attr("stroke", "black")
-		.attr("width", 200)
-		.attr("height", 200);
-	
 
 	var circles = svg.selectAll("circle").data(arr);
-	var speed = .1;
-	var speed_down = .5;
-	var delay = 100; 
+	var speed = 5;
+	var speed_down = 10;
+	var delay = 50;
 	var pad = 20;
 	var toppy = svg.append("path").attr("d", "M 205 60 L " + root_loc.x + " " + root_loc.y);
 
+	var grades_scale = d3.scaleLinear().domain([d3.min(grades_1), d3.max(grades_1)])
+		.range([pad,ball_svg_width - pad]);
+	console.log(paths)
 	circles.enter().append("circle").attr("class", "balls_bouncing")
 		.merge(circles)
 		.attr("transform", "translate(205,60)")
@@ -313,7 +331,10 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 		.attr("transform", (d) => "translate(" + root_loc.x + "," + root_loc.y + ")")
 		
 		.transition()
-		.duration(d => paths[d.data].node().getTotalLength()/speed)
+		.duration(function(d) {
+			console.log(d.data)
+			console.log(paths[d.data])
+			return paths[d.data].node().getTotalLength()/speed})
       	.attrTween("transform", function(d){
       		return translateAlong(paths[d["data"]].node());})
 		.transition()
@@ -323,5 +344,23 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 			tree_arr[d["data"]][l]["x2"], ball_svg_height - pad - 4*d["count"])/speed_down;
 		})
 		.attr("transform", (d) => "translate("+tree_arr[d["data"]][l]["x2"]+","+(ball_svg_height - pad - 4*d["count"])+")")
-
+		.transition()
+		.duration(1000)
+		.delay(function(d,i) {
+			return delay*(i); })
+		.attr("transform", (d) => "translate("+ (4*d["count"] + pad)+ "," +  (tree_arr[d["data"]][l]["x2"] + 200 ) +")").transition()
+		.transition()
+		.duration(1000)
+		.attr("opacity", 1)
+		.attr("transform", (d) => "translate("+ (grades_scale(d.grade)) + "," +  (tree_arr[d["data"]][l]["x2"]*2 + 200 ) +")")
+		.transition()
+		.attr("r", (d) => {
+			category = d.data;
+			grade = d.grade;
+			// console.log(grades_per_category[d.data][d.grade])
+			return 1+1.5*grades_per_category[d.data][d.grade];
+		})
+		.on("end", function(){
+			after_transition = true;
+		});
 }
