@@ -14,7 +14,6 @@ function determineTreeBox(person, function_arr){
 }
 function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_loc, full_data, factor_obj, paths){
 	//produce n balls from a spout that move down 
-	// console.log(factor_obj)
 	outside_tree = tree_arr;
 	g_ball_svg = ball_svg;
 	var rect = ball_svg.append("rect")
@@ -306,7 +305,6 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 
 	var grades_scale = d3.scaleLinear().domain([d3.min(grades_1), d3.max(grades_1)])
 		.range([pad,ball_svg_width - pad]);
-	console.log(paths)
 	circles.enter().append("circle").attr("class", "balls_bouncing")
 		.merge(circles)
 		.attr("transform", "translate(205,60)")
@@ -332,8 +330,6 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 		
 		.transition()
 		.duration(function(d) {
-			console.log(d.data)
-			console.log(paths[d.data])
 			return paths[d.data].node().getTotalLength()/speed})
       	.attrTween("transform", function(d){
       		return translateAlong(paths[d["data"]].node());})
@@ -357,7 +353,6 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 		.attr("r", (d) => {
 			category = d.data;
 			grade = d.grade;
-			// console.log(grades_per_category[d.data][d.grade])
 			return 1+1.5*grades_per_category[d.data][d.grade];
 		})
 		.on("end", function(){

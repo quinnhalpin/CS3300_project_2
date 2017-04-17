@@ -151,9 +151,10 @@
 
 
 		function add_selector_values(selector_arr, questions, questions_ind){
+			//adds values to selectors
 			if (selector_arr.length <=0) return;
 			var selector = selector_arr[0]
-			selector.on("change", function(x){console.log(d3.select(this).property("value"))})
+			selector.on("change", function(x){})
 				.selectAll("option").data(questions).enter().append("option")
 				.text(d=>d)
 			selector.select("options").attr("defaultSelected",true);
@@ -161,14 +162,6 @@
 			questions.push(head)
 			selector_arr.shift()
 			add_selector_values(selector_arr, questions, questions_ind + 1)
-
-			// selector_arr.forEach(function(selector,i){
-			// 	selector.on("change", function(x){console.log(d3.select(this).property("value"))})
-			// 	.selectAll("option").data(questions).enter().append("option")
-			// 	.text(d=>d)
-				
-				
-			// })
 		}
 
 		var selector_1 = d3.select("#selector_1")
@@ -186,7 +179,6 @@
 			factor_obj ={"factor_arr": [], "questions_arr":[], "shortened_arr": []};
 			var funct, shorten_q, question;
 			all_selectors.forEach(function(selector){
-				console.log(selector.property("value"))
 				question = selector.property("value");
 				factor_obj["factor_arr"].push(questions_data[question][0]);
 				factor_obj["questions_arr"].push(question);
@@ -194,7 +186,6 @@
 			})
 			var tree_root = {"x": 205, "y": 70};
 			var splits = Math.pow(2,factor_obj["factor_arr"].length)
-			console.log(factor_obj)
 			if (created_tree == false){
 
 				tree_arr = createTreeBegin(ball_svg, tree_root, 200, 200, splits);
