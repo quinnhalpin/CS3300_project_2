@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Quinn Halpin, qmh4</title>
+<title>Elise Colbert (emc277), Jacob Gleberman (jhg279), Quinn Halpin (qmh4)</title>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
 <style>
@@ -12,13 +12,13 @@
 <body>
 <div>
 	<select id = "dataset">
-	</select>
+	</select><br>
 	<select id = "selector_1">
-	</select>
+	</select><br>
 	<select id = "selector_2">
-	</select>
+	</select><br>
 	<select id = "selector_3">
-	</select>
+	</select><br>
 	<select id = "special_selector">
 	</select>
 	<button id="see_tree">See Tree</button>
@@ -28,6 +28,7 @@
 <script type="text/javascript">
 	var student_math = [];
 	var student_por = [];
+	var student_int = [];
 	var tree_arr = [];
 	var paths;
 	function parseRow(row) {
@@ -74,9 +75,17 @@
 		return row;
 	}
 
+	function parseInternationalStudents(row) {
+		row.gender = (row.gender == "Male") ? 1 : 0;
+		row.StudentAbsenceDays = (row.StudentAbsenceDays == "Above-7") ? 1: 0;
+		row.ParentschoolSatisfaction = (row.ParentschoolSatisfaction == "Good") ? 1: 0;
+	}
+
  	d3.queue()
         .defer(d3.csv, "student_grades/student-mat.csv", parseStudentRow)
         .defer(d3.csv, "student_grades/student-por.csv", parseStudentRow)
+        .defer(d3.csv, "xAPI-Edu-Data.csv", parseInternationalStudents)
+        .defer(d3.csv, "Speed-Dating-Data.csv")
         .await(load_data);
     
     function createTreePath(svg, tree_arr){
@@ -104,7 +113,9 @@
             path_arr.push(svg_path);
     	}
     	return path_arr;
-    }	
+    }
+
+    var data_dict = {};
 
     function normalize(dataset, chosen_functions, special_funct){
     	//given a dataset, determine how many people are in a category and normalize
@@ -153,16 +164,21 @@
     	return normalized_dataset;
     }
 
-
- 	function load_data(error, math, portugal){
+ 	function load_data(error, math, portugal, international, speeddating){
  		student_math = math;
  		student_por = portugal;
+ 		student_int = international;
  		var ball_svg_height = 600;
 		var ball_svg_width = 1000;
 		
 		var ball_svg = d3.select("#ball_animation").append("svg")
 		.attr("height", ball_svg_height)
 		.attr("width", ball_svg_width);
+
+		databases = {};
+		databases["High school student data in Portugal"] = "math";
+		databases["International students data"] = "int";
+		databases["Speed dating in Colombia"] = "dating";
 
 		function hasInternet(person){
 			return person.internet;
@@ -176,7 +192,7 @@
 		function hasNursery(person){
 			return person.nursery;
 		}
-		function hasActivites(person){
+		function hasActivities(person){
 			return person.activities;
 		}
 		function parentsApart(person){
@@ -185,22 +201,77 @@
 		function liveInCity(person){
 			return person.address == "U";
 		}
+
+		data_dict["math"] = [hasInternet, hasRomance, isHigher, hasNursery, hasActivities, parentsApart, liveInCity];
+
+		//INTERNATIONAL DATA
+		function isMale(person){
+			return person.gender;
+		}
+		function manyAbsences(person){
+			return person.StudentAbsenceDays;
+		}
+		function parentsSatisfied(person){
+			return person.ParentschoolSatisfaction;
+		}
+		function highGrades(person){
+			return person.Class == "H";
+		}
+		function lowGrades(person){
+			return person.Class == "L";
+		}
+
+		data_dict["int"] = [isMale, manyAbsences, parentsSatisfied, highGrades, lowGrades];
+
+		//SPEEDDATING
+		function isMaleDate(person){
+			return person.gender;
+		}
+		function valuesRace(person){
+			return person.imprace >= 6;
+		}
+		function valuesReligion(person){
+			return person.impreligion >=6;
+		}
+		function datesFrequently(person){
+			//if a person goes on dates more than once a month
+			return person.date <=5;
+		}
+
+		data_dict["dating"] = [isMaleDate, valuesRace, valuesReligion, datesFrequently];
 		
 		var curr_hue = 1;
 		d3.select("#see_grades").on("click", function() {see_grades(ball_svg)});
 		d3.select("#user_input").append("text").style("font", "17px times")
 		.text("Speed");
 
-		var questions_data = {
-			"Does the student do extracurriculars?": [hasActivites, "Extracurriculars"],
+		var questions_data_math = {
+			"Does the student do extracurriculars?": [hasActivities, "Extracurriculars"],
 			"Does the student live in urban environment?": [liveInCity, "Urban Area"],
 			"Does the student have internet?": [hasInternet, "Internet"],
-			"Is the student in a romantic relationship": [hasRomance, "Romance"],
+			"Is the student in a romantic relationship?": [hasRomance, "Romance"],
 			"Did the student go to higher education?": [isHigher, "Higer Education"],
 			"Did the student go to nursery school?": [hasNursery, "Nursery"],
 			"Do the parents live apart?": [parentsApart, "Parents Apart"]
 			}
 
+		var questions_data_int ={
+			"Is the student male?": [isMale, "Male"],
+			"Does the student have more than 7 absences?": [manyAbsences, "Many absences"],
+			"Are the student's parents satisfied with their school?": [parentsSatisfied, "Parents satisfied"],
+			"Does the student get high grades?": [highGrades, "High grades"],
+			"Does the student get low grades?": [lowGrades, "Low grades"]
+		}
+
+		var questions_data_date = {
+			"Is the subject male?": [isMaleDate, "Male"],
+			"Does the participant prefer a partner who is the same race as them?": [valuesRace, "Values same race"],
+			"Does the participant prefer a partner who is the same religion as them?": [valuesReligion, "Values same religion"],
+			"Does the participant date more than once a month?": [datesFrequently, "Dates more than once a month"]
+		}
+
+		//TEMPORARY
+		questions_data = questions_data_math;
 
 		function add_selector_values(selector_arr, questions, questions_ind){
 			//adds values to selectors
@@ -221,15 +292,15 @@
 		var selector_3 = d3.select("#selector_3");
 		var special_selector = d3.select("#special_selector");
 		var select_dataset = d3.select("#dataset");
-		//add options for dataset
-		select_dataset.on("change", function(x){})
-				.selectAll("option").data(["high school students in portugal"]).enter().append("option")
-				.text(d=>d)
+
 		var all_selectors = [selector_1, selector_2, selector_3]
 		var temp_arr_selectors = [selector_1, selector_2, selector_3, special_selector];
 		var temp_questions_data = questions_data;
+		var temp_dataset_questions = databases;
+		var temp_dataset_selectors = [select_dataset];
 		add_selector_values(temp_arr_selectors, Object.keys(temp_questions_data), 0)
-
+		add_selector_values(temp_dataset_selectors, Object.keys(temp_dataset_questions), 0)
+		
 		d3.select("#see_tree").on("click", see_tree);
 		var created_tree = false;
 		var paths;
