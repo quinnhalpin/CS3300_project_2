@@ -22,11 +22,6 @@
 </div>
 <script type = "text/javascript" src = "animation.js"></script>
 <script type="text/javascript">
- 	var la_2011_data = [];
- 	var la_2012_data = [];
- 	var la_2013_data = [];
- 	var la_2014_data = [];
- 	var la_2015_data = [];
 	var student_math = [];
 	var student_por = [];
 	var tree_arr = [];
@@ -46,6 +41,7 @@
 		// change all string numbers to numbers
 		// yes = 1
 		// no = 0
+		// some options are not listed here because parsing them wasn't necessary
 		row.Dalc = Number(row.Dalc);
 		row.Fedu = Number(row.Fedu);
 		row.G1 = Number(row.G1);
@@ -154,23 +150,34 @@
 			}
 
 
-		function add_selector_values(selector_arr, questions){
-			selector_arr.forEach(function(selector){
-				selector.on("change", function(x){console.log(d3.select(this).property("value"))})
+		function add_selector_values(selector_arr, questions, questions_ind){
+			if (selector_arr.length <=0) return;
+			var selector = selector_arr[0]
+			selector.on("change", function(x){console.log(d3.select(this).property("value"))})
 				.selectAll("option").data(questions).enter().append("option")
 				.text(d=>d)
-				
-				selector.select("options").attr("defaultSelected", true);
+			selector.select("options").attr("defaultSelected",true);
+			var head = questions.shift()
+			questions.push(head)
+			selector_arr.shift()
+			add_selector_values(selector_arr, questions, questions_ind + 1)
 
-			})
+			// selector_arr.forEach(function(selector,i){
+			// 	selector.on("change", function(x){console.log(d3.select(this).property("value"))})
+			// 	.selectAll("option").data(questions).enter().append("option")
+			// 	.text(d=>d)
+				
+				
+			// })
 		}
 
 		var selector_1 = d3.select("#selector_1")
 		var selector_2 = d3.select("#selector_2")
 		var selector_3 = d3.select("#selector_3")
 		var all_selectors = [selector_1, selector_2, selector_3]
-
-		add_selector_values(all_selectors, Object.keys(questions_data))
+		var temp_arr_selectors = [selector_1, selector_2, selector_3];
+		var temp_questions_data = questions_data;
+		add_selector_values(temp_arr_selectors, Object.keys(temp_questions_data), 0)
 
 		d3.select("#see_tree").on("click", see_tree);
 		var created_tree = false;
@@ -179,6 +186,7 @@
 			factor_obj ={"factor_arr": [], "questions_arr":[], "shortened_arr": []};
 			var funct, shorten_q, question;
 			all_selectors.forEach(function(selector){
+				console.log(selector.property("value"))
 				question = selector.property("value");
 				factor_obj["factor_arr"].push(questions_data[question][0]);
 				factor_obj["questions_arr"].push(question);
@@ -186,7 +194,7 @@
 			})
 			var tree_root = {"x": 205, "y": 70};
 			var splits = Math.pow(2,factor_obj["factor_arr"].length)
-			
+			console.log(factor_obj)
 			if (created_tree == false){
 
 				tree_arr = createTreeBegin(ball_svg, tree_root, 200, 200, splits);
