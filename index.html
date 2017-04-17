@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Quinn Halpin, qmh4</title>
+<title>Elise Colbert (emc277), Jacob Gleberman (jhg279), Quinn Halpin (qmh4)</title>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
 <style>
@@ -12,11 +12,11 @@
 <body>
 <div>
 	<select id = "selector_1">
-	</select>
+	</select><br>
 	<select id = "selector_2">
-	</select>
+	</select><br>
 	<select id = "selector_3">
-	</select>
+	</select><br>
 	<button id="see_tree">See Tree</button>
 	<p id = "ball_animation"></p>
 </div>
@@ -218,6 +218,9 @@
 			"Does the participant prefer a partner who is the same religion as them?": [valuesReligion, "Values same religion"],
 			"Does the participant date more than once a month?": [datesFrequently, "Dates more than once a month"]
 		}
+
+		//TEMPORARY
+		questions_data = questions_data_math;
 
 		function add_selector_values(selector_arr, questions, questions_ind){
 			//adds values to selectors
