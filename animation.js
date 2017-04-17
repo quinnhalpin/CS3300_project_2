@@ -16,7 +16,7 @@ function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_lo
 	outside_tree = tree_arr;
 	g_ball_svg = ball_svg;
 	var rect = ball_svg.append("rect")
-		.attr("x", 200)
+		.attr("x", 300)
 		.attr("y", 40)
 		.attr("id", "spout")
 		.attr("fill", "purple")
@@ -202,8 +202,9 @@ function dist(x1,y1, x2, y2){
 
 function addStrings(ball_svg_height, ball_svg_width, tree_arr, svg, question_arr){
 	var pad = 200;
+	tree_text = d3.selectAll(".tree_text")
 	for (var i = 0; i < question_arr.length; i++){
-		svg.append("text").style("font", "10px times")
+		tree_text.append("text").style("font", "10px times").attr("class","tree_text")
 		.text(question_arr[i])
 		.attr("x", ball_svg_width- 1.5*pad)
 		.attr("y", tree_arr[0][i]["y1"]);
@@ -294,16 +295,19 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 	//attempt to move circles in a straight line with transitions
 
 	var circles = svg.selectAll("circle").data(arr);
-	var speed = 5;
-	var speed_down = 10;
-	var delay = 50;
+	var speed = .5;
+	var speed_down = 1;
+	var delay = 80;
 	var pad = 20;
 	var y_scale_perc = d3.scaleLinear().domain([0,100]).range([ball_svg_height-pad, 200]);
+	var y_scale_axis = d3.axisLeft(y_scale_perc).ticks(9).tickSize(9);
+	svg.append("g").style("font", "10px times")
+      	.call(y_scale_axis).attr("transform","translate(70,0)");	
 	var toppy = svg.append("path").attr("d", "M 205 60 L " + root_loc.x + " " + root_loc.y);
 
 	circles.enter().append("circle").attr("class", "balls_bouncing")
 		.merge(circles)
-		.attr("transform", "translate(205,60)")
+		.attr("transform", "translate(305,60)")
 		.attr("r", 4)
 		.attr("id", function (c,i){ 
 			return c.data;
