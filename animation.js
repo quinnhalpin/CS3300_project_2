@@ -2,7 +2,6 @@ var outside_tree;
 var x_scale;
 var grades_1;
 var after_transition = false;
-var grades_per_category = [];
 function determineTreeBox(person, function_arr){
 	//take multiple boolean functions and use them to determine path of person
 	//assume f1 is top tree level, ... fn is bottom
@@ -37,37 +36,35 @@ function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_lo
 
 	var attrib_intersect = [];
 	var circle_data = [];
-	grades_1 = full_data.map(function(d){
-		return d.G1;
-	})
 	
-	var student_results = full_data.map(function(x){
-		var category = determineTreeBox(x, factor_obj.factor_arr);
-		// console.log(category);
+	var results = full_data["ball_data"].map(function(x){
+		attrib_intersect[x] = attrib_intersect[x] ? attrib_intersect[x] + 1 : 1;
+		circle_data.push({data: x, count:attrib_intersect[x]});
+		return x;
+	})
 
-		if(!grades_per_category[category]) {
-			grades_per_category[category] = [];	
-		}
-		var grade_for_x = x.G1;
-		grades_per_category[category][grade_for_x] = grades_per_category[category][grade_for_x] ?  
-		grades_per_category[category][grade_for_x] + 1 : 1;
 
-		attrib_intersect[category] = attrib_intersect[category] ? attrib_intersect[category] + 1 : 1;
+	// var student_results = full_data.map(function(x){
+	// 	var category = determineTreeBox(x, factor_obj.factor_arr);
+	// 	// console.log(category);
 
-		circle_data.push({data:category, count:attrib_intersect[category], "grade": x.G1});
-		return category;
-	});
+	// 	// normalized_dataset = {"ball_data": [], "special_param": []};
+	// 	attrib_intersect[category] = attrib_intersect[category] ? attrib_intersect[category] + 1 : 1;
+
+	// 	circle_data.push({data:, count:attrib_intersect[category]});
+	// 	return category;
+	// });
 	console.log(circle_data)
 	// console.log("Grades per category ")
 	// console.log( grades_per_category)
 	var pad = 20;
-	x_scale = d3.scaleLinear().domain([4*d3.min(student_results), 4*d3.max(student_results)])
+	x_scale = d3.scaleLinear().domain([4*d3.min(results), 4*d3.max(results)])
 			.range([pad,ball_svg_width - pad]);
 
 	var circles = ball_svg.selectAll("circle").data(circle_data.reverse());
 	var i = 0;
 	// console.log(factor_obj)
-	moveCircle(circle_data, ball_svg_width, ball_svg_height, tree_arr, ball_svg, full_data.length, root_loc, paths, factor_obj);
+	moveCircle(circle_data, ball_svg_width, ball_svg_height, tree_arr, ball_svg, full_data["ball_data"].length, root_loc, paths, factor_obj);
 	return tree_arr;	
 }
 
@@ -301,10 +298,9 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 	var speed_down = 10;
 	var delay = 50;
 	var pad = 20;
+	var y_scale_perc = d3.scaleLinear().domain([0,100]).range([ball_svg_height-pad, 200]);
 	var toppy = svg.append("path").attr("d", "M 205 60 L " + root_loc.x + " " + root_loc.y);
 
-	var grades_scale = d3.scaleLinear().domain([d3.min(grades_1), d3.max(grades_1)])
-		.range([pad,ball_svg_width - pad]);
 	circles.enter().append("circle").attr("class", "balls_bouncing")
 		.merge(circles)
 		.attr("transform", "translate(205,60)")
@@ -337,25 +333,29 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 		.duration(function(d){
 			l = tree_arr[0].length-1;
 			return dist(tree_arr[d["data"]][l]["x2"], tree_arr[d["data"]][l]["y2"],
-			tree_arr[d["data"]][l]["x2"], ball_svg_height - pad - 4*d["count"])/speed_down;
+			tree_arr[d["data"]][l]["x2"], y_scale_perc(d["count"]))/speed_down;
+		
 		})
-		.attr("transform", (d) => "translate("+tree_arr[d["data"]][l]["x2"]+","+(ball_svg_height - pad - 4*d["count"])+")")
+		.attr("transform", (d) =>
+		  "translate("+tree_arr[d["data"]][l]["x2"]+","+(y_scale_perc(d["count"]))+")")
 		.transition()
-		.duration(1000)
-		.delay(function(d,i) {
-			return delay*(i); })
-		.attr("transform", (d) => "translate("+ (4*d["count"] + pad)+ "," +  (tree_arr[d["data"]][l]["x2"] + 200 ) +")").transition()
-		.transition()
-		.duration(1000)
-		.attr("opacity", 1)
-		.attr("transform", (d) => "translate("+ (grades_scale(d.grade)) + "," +  (tree_arr[d["data"]][l]["x2"]*2 + 200 ) +")")
-		.transition()
-		.attr("r", (d) => {
-			category = d.data;
-			grade = d.grade;
-			return 1+1.5*grades_per_category[d.data][d.grade];
-		})
+		// .duration(1000)
+		// .delay(function(d,i) {
+		// 	return delay*(i); })
+		// .attr("transform", (d) => "translate("+ (4*d["count"] + pad)+ "," +  (tree_arr[d["data"]][l]["x2"] + 200 ) +")").transition()
+		// .transition()
+		// .duration(1000)
+		// .attr("opacity", 1)
+		// .attr("transform", (d) => "translate("+ (grades_scale(d.grade)) + "," +  (tree_arr[d["data"]][l]["x2"]*2 + 200 ) +")")
+		// .transition()
+		// .attr("r", (d) => {
+		// 	category = d.data;
+		// 	grade = d.grade;
+		// 	return 1+1.5*grades_per_category[d.data][d.grade];
+		// })
 		.on("end", function(){
 			after_transition = true;
 		});
+
+
 }

@@ -11,11 +11,15 @@
 </head>
 <body>
 <div>
+	<select id = "dataset">
+	</select>
 	<select id = "selector_1">
 	</select>
 	<select id = "selector_2">
 	</select>
 	<select id = "selector_3">
+	</select>
+	<select id = "special_selector">
 	</select>
 	<button id="see_tree">See Tree</button>
 	<p id = "ball_animation"></p>
@@ -102,10 +106,58 @@
     	return path_arr;
     }	
 
+    function normalize(dataset, chosen_functions, special_funct){
+    	//given a dataset, determine how many people are in a category and normalize
+    	//determine number of people in each category
+    	category = [];
+
+    	// dataset.forEach(function(p){
+
+    	// })
+
+    	for (var i= 0;i < Math.pow(2,chosen_functions.length); i++){
+    		category.push({"num_units": 0, "per_yes_special":0});
+    	}
+    	//special param is an array by category index and holds % yes for that category
+    	normalized_dataset = {"ball_data": [], "special_param": []};
+    	num_options = Math.pow(2,chosen_functions.length) - 1; 
+    	dataset.forEach(function(p){
+    		var cat_ind = chosen_functions.reduce(function (acc,fun, ind){ 
+    			//determine category of each unit in dataset
+    			return acc - Math.pow(2,chosen_functions.length - 1 - ind)*fun(p);
+    		}, num_options);
+    		//add to the number of people in this category
+    		category[cat_ind].num_units += 1;
+    		//add to the number of yes people for this category
+    		category[cat_ind].per_yes_special += (special_funct(p)) ? 1 : 0;
+    	})
+    	console.log(category)
+    	category.forEach(function(category_value, cat_ind){
+    		//define percent of yes according to special function for this category
+    		num_people = category[cat_ind]["num_units"];
+    		category[cat_ind]["per_yes_special"] = (num_people > 0) ? 
+    			Math.round(100*(category[cat_ind]["per_yes_special"]/num_people)) : 0;
+    		//define percent of people in this category
+    		category[cat_ind]["num_units"] = Math.round(100*(num_people/dataset.length));
+    	})
+
+    	for (var j = 0; j < category.length; j++){
+    		//for each category add a ball for each percent in that category
+			for (var k = 0; k < category[j]["num_units"]; k++){
+				normalized_dataset["ball_data"].push(j);	
+    		}
+    	}
+
+    	d3.shuffle(normalized_dataset["ball_data"])
+    	normalized_dataset["special_param"] = category.map(x=> x.per_yes_special);
+    	return normalized_dataset;
+    }
+
+
  	function load_data(error, math, portugal){
  		student_math = math;
  		student_por = portugal;
- 		var ball_svg_height = 900;
+ 		var ball_svg_height = 600;
 		var ball_svg_width = 1000;
 		
 		var ball_svg = d3.select("#ball_animation").append("svg")
@@ -131,7 +183,7 @@
 			return person.Pstatus == "A";
 		}
 		function liveInCity(person){
-			return person.Pstatus == "U";
+			return person.address == "U";
 		}
 		
 		var curr_hue = 1;
@@ -164,11 +216,17 @@
 			add_selector_values(selector_arr, questions, questions_ind + 1)
 		}
 
-		var selector_1 = d3.select("#selector_1")
-		var selector_2 = d3.select("#selector_2")
-		var selector_3 = d3.select("#selector_3")
+		var selector_1 = d3.select("#selector_1");
+		var selector_2 = d3.select("#selector_2");
+		var selector_3 = d3.select("#selector_3");
+		var special_selector = d3.select("#special_selector");
+		var select_dataset = d3.select("#dataset");
+		//add options for dataset
+		select_dataset.on("change", function(x){})
+				.selectAll("option").data(["high school students in portugal"]).enter().append("option")
+				.text(d=>d)
 		var all_selectors = [selector_1, selector_2, selector_3]
-		var temp_arr_selectors = [selector_1, selector_2, selector_3];
+		var temp_arr_selectors = [selector_1, selector_2, selector_3, special_selector];
 		var temp_questions_data = questions_data;
 		add_selector_values(temp_arr_selectors, Object.keys(temp_questions_data), 0)
 
@@ -184,16 +242,19 @@
 				factor_obj["questions_arr"].push(question);
 				factor_obj["shortened_arr"].push(questions_data[question][1]);
 			})
+			special_fun = questions_data[special_selector.property("value")][0];
+			special_short_quest = questions_data[special_selector.property("value")][1];
 			var tree_root = {"x": 205, "y": 70};
-			var splits = Math.pow(2,factor_obj["factor_arr"].length)
+			var splits = Math.pow(2, factor_obj["factor_arr"].length)
+			var normalized_dataset = normalize(student_math,factor_obj["factor_arr"], special_fun);
 			if (created_tree == false){
-
 				tree_arr = createTreeBegin(ball_svg, tree_root, 200, 200, splits);
 				paths = createTreePath(ball_svg, tree_arr);
 			}
-			spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, tree_root,student_math, factor_obj, paths);
+			spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, tree_root,normalized_dataset, factor_obj, paths);
+			// spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, tree_root,student_math, factor_obj, paths);
  			addStrings(ball_svg_height, ball_svg_width, tree_arr, ball_svg, factor_obj["questions_arr"]);		
-			created_tree = true;
+			created_tree = true
 		}
 
 		
