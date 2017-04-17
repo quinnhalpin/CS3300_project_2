@@ -24,6 +24,7 @@
 <script type="text/javascript">
 	var student_math = [];
 	var student_por = [];
+	var student_int = [];
 	var tree_arr = [];
 	var paths;
 	function parseRow(row) {
@@ -70,9 +71,17 @@
 		return row;
 	}
 
+	function parseInternationalStudents(row) {
+		row.gender = (row.gender == "Male") ? 1 : 0;
+		row.StudentAbsenceDays = (row.StudentAbsenceDays == "Above-7") ? 1: 0;
+		row.ParentschoolSatisfaction = (row.ParentschoolSatisfaction == "Good") ? 1: 0;
+	}
+
  	d3.queue()
         .defer(d3.csv, "student_grades/student-mat.csv", parseStudentRow)
         .defer(d3.csv, "student_grades/student-por.csv", parseStudentRow)
+        .defer(d3.csv, "xAPI-Edu-Data.csv", parseInternationalStudents)
+        .defer(d3.csv, "Speed-Dating-Data.csv")
         .await(load_data);
     
     function createTreePath(svg, tree_arr){
@@ -100,11 +109,14 @@
             path_arr.push(svg_path);
     	}
     	return path_arr;
-    }	
+    }
 
- 	function load_data(error, math, portugal){
+    var data_dict = {};
+
+ 	function load_data(error, math, portugal, international, speeddating){
  		student_math = math;
  		student_por = portugal;
+ 		student_int = international;
  		var ball_svg_height = 900;
 		var ball_svg_width = 1000;
 		
@@ -133,22 +145,74 @@
 		function liveInCity(person){
 			return person.Pstatus == "U";
 		}
+
+		data_dict["math"] = [hasInternet, hasRomance, isHigher, hasNursery, hasActivities, parentsApart, liveInCity];
+
+		//INTERNATIONAL DATA
+		function isMale(person){
+			return person.gender;
+		}
+		function manyAbsences(person){
+			return person.StudentAbsenceDays;
+		}
+		function parentsSatisfied(person){
+			return person.ParentschoolSatisfaction;
+		}
+		function highGrades(person){
+			return person.Class == "H";
+		}
+		function lowGrades(person){
+			return person.Class == "L";
+		}
+
+		data_dict["int"] = [isMale, manyAbsences, parentsSatisfied, highGrades, lowGrades];
+
+		//SPEEDDATING
+		function isMaleDate(person){
+			return person.gender;
+		}
+		function valuesRace(person){
+			return person.imprace >= 6;
+		}
+		function valuesReligion(person){
+			return person.impreligion >=6;
+		}
+		function datesFrequently(person){
+			//if a person goes on dates more than once a month
+			return person.date <=5;
+		}
+
+		data_dict["dating"] = [isMaleDate, valuesRace, valuesReligion, datesFrequently];
 		
 		var curr_hue = 1;
 		d3.select("#see_grades").on("click", function() {see_grades(ball_svg)});
 		d3.select("#user_input").append("text").style("font", "17px times")
 		.text("Speed");
 
-		var questions_data = {
+		var questions_data_math = {
 			"Does the student do extracurriculars?": [hasActivites, "Extracurriculars"],
 			"Does the student live in urban environment?": [liveInCity, "Urban Area"],
 			"Does the student have internet?": [hasInternet, "Internet"],
-			"Is the student in a romantic relationship": [hasRomance, "Romance"],
+			"Is the student in a romantic relationship?": [hasRomance, "Romance"],
 			"Did the student go to higher education?": [isHigher, "Higer Education"],
 			"Did the student go to nursery school?": [hasNursery, "Nursery"],
 			"Do the parents live apart?": [parentsApart, "Parents Apart"]
 			}
 
+		var questions_data_int ={
+			"Is the student male?": [isMale, "Male"],
+			"Does the student have more than 7 absences?": [manyAbsences, "Many absences"],
+			"Are the student's parents satisfied with their school?": [parentsSatisfied, "Parents satisfied"],
+			"Does the student get high grades?": [highGrades, "High grades"],
+			"Does the student get low grades?": [lowGrades, "Low grades"]
+		}
+
+		var questions_data_date = {
+			"Is the subject male?": [isMaleDate, "Male"],
+			"Does the participant prefer a partner who is the same race as them?": [valuesRace, "Values same race"],
+			"Does the participant prefer a partner who is the same religion as them?": [valuesReligion, "Values same religion"],
+			"Does the participant date more than once a month?": [datesFrequently, "Dates more than once a month"]
+		}
 
 		function add_selector_values(selector_arr, questions, questions_ind){
 			//adds values to selectors
