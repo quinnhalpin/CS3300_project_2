@@ -24,7 +24,7 @@
 	#ball_animation{
 	  width: 900px;
 	  top:50;
-	  left: 250;
+	  left: 230;
 	  position:fixed;
 	  margin-left: 40px;
 	}
@@ -199,7 +199,6 @@
     		//add to the number of yes people for this category
     		category[cat_ind].per_yes_special += (special_funct(p)) ? 1 : 0;
     	})
-    	console.log(category)
     	category.forEach(function(category_value, cat_ind){
     		//define percent of yes according to special function for this category
     		num_people = category[cat_ind]["num_units"];
@@ -217,6 +216,16 @@
     		}
     	}
 
+    	// function_data_arr = chosen_functions.reduce(f=>{ 
+    	// 	acc = 0;
+    	// 	arr = dataset.forEach(function(data_unit){
+    	// 		acc += (f(data_unit)) ? 1:0;
+    	// 	})
+    	// 	return arr; 
+    	// 	})
+
+    	// console.log(function_data_arr)
+
     	//d3.shuffle(normalized_dataset["ball_data"])
     	normalized_dataset["special_param"] = category.map(x=> x.per_yes_special);
     	make_large_pie(category);
@@ -230,8 +239,8 @@
  		student_math = math;
  		student_por = portugal;
  		student_int = international;
- 		ball_svg_height = 800;
-		ball_svg_width = 1200;
+ 		ball_svg_height = 600;
+		ball_svg_width = 800;
 		
 		ball_svg = d3.select("#ball_animation").append("svg")
 		.attr("height", ball_svg_height)
@@ -400,7 +409,7 @@
 			var splits = Math.pow(2, factor_obj["factor_arr"].length)
 			var normalized_dataset = normalize(student_math,factor_obj["factor_arr"], special_fun);
 			if (created_tree == false){
-				tree_arr = createTreeBegin(ball_svg, tree_root, 400, 400, splits);
+				tree_arr = createTreeBegin(ball_svg, tree_root, 300, 300, splits);
 				paths = createTreePath(ball_svg, tree_arr);
 			}
 			spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, tree_root,normalized_dataset, factor_obj, paths);

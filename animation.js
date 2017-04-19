@@ -440,7 +440,7 @@ function make_large_pie( categories, nullspace){
 	}))
 
 	
-	var radius = 130;
+	var radius = 100;
 	
 	var arc = d3.arc()
     .innerRadius(radius/2)
@@ -478,13 +478,13 @@ function make_large_pie( categories, nullspace){
 	    return arc(i(t));
 	  };
 	}
-
-
-	// for (var j = 0; j < categories.length - 1; j++){
-	// 	var current_section = d3.select("pie_selection_" + j);
- // 		current_section.transition().duration(10000).attrTween("d", arcTween(4));
-	// }
 }
 
+
+function make_vienn_diagram(){
+
+	// ball_svg.append("circle")
+
+}
 
 
