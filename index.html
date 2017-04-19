@@ -344,7 +344,7 @@
 		}
 
 		//TEMPORARY
-		questions_data = questions_data_math;
+		//questions_data = questions_data_math;
 
 		d3.graphScroll()
 			.graph(d3.selectAll('#ball_svg'))
@@ -375,6 +375,7 @@
 
 		var all_selectors = [selector_1, selector_2, selector_3]
 		var temp_arr_selectors = [selector_1, selector_2, selector_3, special_selector];
+		questions_data = questions_data_math;
 		var temp_questions_data = questions_data;
 		var temp_dataset_questions = databases;
 		var temp_dataset_selectors = [select_dataset];
@@ -392,17 +393,35 @@
 		//trigger tree for any values selectors changing
 		d3.selectAll("select").on("change", see_tree);
 		
-
 		function see_tree(){
 			called_see_tree = true;
 			factor_obj ={"factor_arr": [], "questions_arr":[], "shortened_arr": []};
 			var funct, shorten_q, question;
+			console.log(questions_data);
+			var dataset_choice = select_dataset.property("value");
+			console.log("DATA CHOICE IS HERE");
+			if (dataset_choice == "International students data"){
+				questions_data = questions_data_int;
+			}
+			if (dataset_choice == "High school student data in Portugal"){
+				questions_data = questions_data_math;
+			}
+
+			//var temp_questions_data = questions_data;
+			//var temp_dataset_questions = databases;
+			//var temp_dataset_selectors = [select_dataset];
+			temp_questions_data = questions_data;
+			add_selector_values(temp_arr_selectors, Object.keys(temp_questions_data), 0)
+			add_selector_values(temp_dataset_selectors, Object.keys(temp_dataset_questions), 0)
+
 			all_selectors.forEach(function(selector){
 				question = selector.property("value");
+				console.log(question);
 				factor_obj["factor_arr"].push(questions_data[question][0]);
 				factor_obj["questions_arr"].push(question);
 				factor_obj["shortened_arr"].push(questions_data[question][1]);
 			})
+
 			special_fun = questions_data[special_selector.property("value")][0];
 			special_short_quest = questions_data[special_selector.property("value")][1];
 			tree_root = {"x": ball_svg_width/2, "y": ball_svg_height*.1};
