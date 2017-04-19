@@ -246,20 +246,20 @@ function showSign(svg, data, paths, tree_arr, factor_obj, fromPath){
 	var rect = svg.append("rect")
 		.attr("id", "show_rect")
 		.attr("x", function(){
-			return (after_transition) ? 450: (fromPath) ? tree_arr[data][l]["x2"] + 50 : tree_arr[data][l]["x2"] + 50;})
-		.attr("y", function() { return after_transition ? 25: 200})
+			return (fromPath) ? tree_arr[data][l]["x2"] - 50: tree_arr[data][l]["x2"] -50;})
+		.attr("y", function() { return tree_arr[data][l]["y2"] + 70})
 		.attr("fill", "#F4EDE3")
-		.attr("opacity", 1)
 		.attr("stroke", "black")
-		.attr("width", 200)
-		.attr("height", 200);
+		.attr("width", 150)
+		.attr("height", 100)
+		.transition()
+		.duration(500)
+		.attrTween("opacity", d3.interpolate(0, 1));
 	var text = svg.append("text").style("font", "20px times")
 		.attr("id", "rect_text")
 		.html("")
 		.style("font", "14px times")
-		.attr("x", function(){
-		return (fromPath) ? tree_arr[data][l]["x2"] :  tree_arr[data][l]["x2"] + 70;})
-		.attr("y", function() { return after_transition ? 50: 250});
+		.attr("y", function() { return tree_arr[data][l]["y2"] + 70});
 	var d = data;
 	for (var i = 0; i < factor_obj.shortened_arr.length; i++){
 		//begin at first question
@@ -268,7 +268,7 @@ function showSign(svg, data, paths, tree_arr, factor_obj, fromPath){
 		text.append("tspan")
 			.attr("dy", 20)
 			.attr("x",function(){
-				return (after_transition) ? 480 :tree_arr[data][l]["x2"] + 70;})
+				return (after_transition) ? 480 :tree_arr[data][l]["x2"] - 40;})
 			.text(function() {
 				var factor_str = factor_obj.shortened_arr[i];
 				if (d>= Math.pow(2,opp_i)){
@@ -280,6 +280,12 @@ function showSign(svg, data, paths, tree_arr, factor_obj, fromPath){
 				return factor_str;
 			});		
 	}
+	text.append("tspan")
+		.attr("dy", 20)
+		.attr("x",function(){
+			return (after_transition) ? 480 :tree_arr[data][l]["x2"] - 40;})
+		.text(
+			"Percentage:" + (category[data].final_num - category[data].num_units));		
 	svg.selectAll("circle")
 	.attr("opacity", function(d){
 		return  (d.data == data) ? 1 : .1;
@@ -329,7 +335,7 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 			hideSign(svg, c.data, paths);
 		})
 		.style("fill", function(c, i) {
-			return "purple";})
+			return color(c.data+1);})
 		// .transition()
 		// .duration(function(d){
 		// 	return 10/speed;
@@ -363,6 +369,7 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 
 
 }
+
 
 function initial_ball_transition(){
 	//times balls so that they are going out one by one on time
@@ -435,7 +442,7 @@ function make_large_pie( categories, nullspace, delay){
 		return res;
 	}))
 
-	var color = d3.scaleOrdinal(d3.schemeCategory10);
+	color = d3.scaleOrdinal(d3.schemeCategory10);
 	var radius = 100;
 	
 	var arc = d3.arc()
@@ -456,7 +463,7 @@ function make_large_pie( categories, nullspace, delay){
     pie_path = pie_path.data(cat);
 
 	pie_path.enter().append("path").attr("class", "pie_fraction_path")
-    	.attr("fill", function(d, i) { return color(i); })
+    	.attr("fill", function(d, i) { console.log(i);return (i==0) ? '#dddddd' : color(i); })
 	    .attr("id", function(d){ 
 	      	return "pie_section_" + d.index})
 	    .each(function(d) {this._current_angle = d; }) //store initial angles

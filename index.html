@@ -12,7 +12,10 @@
 	  position: relative;
 	  overflow: auto;
 	}
-
+	#selector_div{
+	  float: right;
+	  overflow: auto;
+	}
 	#text_for_scroll{
 	  width: 200px;
 	  float: left;
@@ -20,7 +23,7 @@
 
 	#ball_animation{
 	  width: 900px;
-	  top:0;
+	  top:100;
 	  left: 400;
 	  position:fixed;
 	  margin-left: 40px;
@@ -29,7 +32,7 @@
 </style>
 </head>
 <body>
-<div>
+<div id = "selector_div">
 	<select id = "dataset">
 	</select><br>
 	<select id = "selector_1">
@@ -40,13 +43,12 @@
 	</select><br>
 	<select id = "special_selector">
 	</select>
-	<button id="see_tree">See Tree</button>
-</div>
-<div id = "container">
+	<!-- <button id="see_tree">See Tree</button> -->
+</div><div id = "container">
 	<div id = "ball_animation"></div>
 
 	<div id = "text_for_scroll">
-		<div id = "text_1">
+		<!-- <div id = "text_1">
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis, eros sit amet pellentesque consectetur, enim sapien tincidunt ante, a finibus elit libero non ex. Suspendisse potenti. Aenean consectetur molestie fringilla. In hac habitasse platea dictumst. Donec consectetur risus mi, in consectetur mi vestibulum nec. Etiam cursus, libero ut vulputate malesuada, odio tortor egestas est, egestas tempor diam velit vel ante. Quisque enim felis, porttitor at libero eget, imperdiet auctor mauris. Aliquam congue, turpis a mattis pellentesque, libero nulla porttitor neque, non vehicula leo diam sed lacus. Fusce tincidunt egestas malesuada. Morbi scelerisque posuere sem nec bibendum. Donec euismod dui eu lacinia tempus. Aliquam dictum nulla sed elit suscipit commodo. Nullam lobortis feugiat aliquet. Praesent nec mattis neque. Phasellus ultrices, turpis quis congue porta, purus enim eleifend dui, et pulvinar est magna id quam. Donec eu arcu lobortis, euismod massa et, gravida leo.
 		</div>
 		<div id = "text_2">
@@ -65,7 +67,7 @@
 		</div>
 		<div id = "text_6">
 		Maecenas varius quam efficitur, ullamcorper dui ac, finibus enim. Suspendisse convallis vulputate massa, non cursus dui malesuada ut. Nunc vel augue vestibulum, vulputate magna ut, interdum ex. Nam laoreet vulputate nisl. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Suspendisse egestas, ligula tempor faucibus vehicula, nisl nisi venenatis diam, interdum lobortis nibh libero in ante. Vestibulum vitae massa lorem. Donec egestas volutpat diam sit amet ullamcorper. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Fusce ligula massa, ultricies et elementum eget, scelerisque et augue. Donec eu tristique nisi. Donec odio neque, fermentum eu massa et, dapibus fermentum massa. Donec auctor fringilla turpis ac pharetra. Cras gravida, neque auctor imperdiet iaculis, nulla mi sagittis ante, vitae tempus elit metus vel dui. Duis quis molestie mi, a tempor magna.
-		</div>
+		</div> -->
 	</div>
 </div> 
 </div>
@@ -170,22 +172,28 @@
 
     var data_dict = {};
 
+    function determineCategory(chosen_functions, p){
+    	//given the functions and the data point p determine category
+    	num_options = Math.pow(2,chosen_functions.length) - 1; 
+    	cat_ind = chosen_functions.reduce(function (acc,fun, ind){ 
+    			//determine category of each unit in dataset
+    			return acc - Math.pow(2,chosen_functions.length - 1 - ind)*fun(p);
+    	}, num_options);
+    	return cat_ind;
+    }
+
     function normalize(dataset, chosen_functions, special_funct){
     	//given a dataset, determine how many people are in a category and normalize
     	//determine number of people in each category
     	category = [];
 
     	for (var i= 0;i < Math.pow(2,chosen_functions.length); i++){
-    		category.push({"num_units": 0, "per_yes_special":0});
+    		category.push({"num_units": 0, "per_yes_special":0, "final_num": 0});
     	}
     	//special param is an array by category index and holds % yes for that category
     	normalized_dataset = {"ball_data": [], "special_param": []};
-    	num_options = Math.pow(2,chosen_functions.length) - 1; 
     	dataset.forEach(function(p){
-    		var cat_ind = chosen_functions.reduce(function (acc,fun, ind){ 
-    			//determine category of each unit in dataset
-    			return acc - Math.pow(2,chosen_functions.length - 1 - ind)*fun(p);
-    		}, num_options);
+    		var cat_ind = determineCategory(chosen_functions, p);
     		//add to the number of people in this category
     		category[cat_ind].num_units += 1;
     		//add to the number of yes people for this category
@@ -199,6 +207,7 @@
     			Math.round(100*(category[cat_ind]["per_yes_special"]/num_people)) : 0;
     		//define percent of people in this category
     		category[cat_ind]["num_units"] = Math.round(100*(num_people/dataset.length));
+    		category[cat_ind]["final_num"] = category[cat_ind]["num_units"];
     	})
 
     	for (var j = 0; j < category.length; j++){
@@ -361,7 +370,6 @@
 		add_selector_values(temp_arr_selectors, Object.keys(temp_questions_data), 0)
 		add_selector_values(temp_dataset_selectors, Object.keys(temp_dataset_questions), 0)
 
-		// d3.select("#see_tree").on("click", see_tree);
 		var created_tree = false;
 		var paths;
 		
