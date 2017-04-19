@@ -198,7 +198,7 @@ var scrollVis = function () {
       .duration(600)
       .attr('opacity', 1.0);
   }
-
+}
 /**
  * display - called once data
  * has been loaded.

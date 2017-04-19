@@ -2,6 +2,14 @@ var outside_tree;
 var x_scale;
 var grades_1;
 var after_transition = false;
+var circles;
+var speed;
+var speed_down;
+var delay =80;
+var pad;
+var full_paths;
+var y_scale_perc;
+var full_tree_arr;
 function determineTreeBox(person, function_arr){
 	//take multiple boolean functions and use them to determine path of person
 	//assume f1 is top tree level, ... fn is bottom
@@ -13,6 +21,7 @@ function determineTreeBox(person, function_arr){
 }
 function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_loc, full_data, factor_obj, paths){
 	//produce n balls from a spout that move down 
+	full_paths = paths;
 	outside_tree = tree_arr;
 	g_ball_svg = ball_svg;
 	var rect = ball_svg.append("rect")
@@ -54,7 +63,6 @@ function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_lo
 	// 	circle_data.push({data:, count:attrib_intersect[category]});
 	// 	return category;
 	// });
-	console.log(circle_data)
 	// console.log("Grades per category ")
 	// console.log( grades_per_category)
 	var pad = 20;
@@ -292,20 +300,22 @@ function hideSign(svg, data, paths){
 }
 
 function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root_loc, paths, factor_obj){
+	svg.selectAll("circle").remove().exit();
+	svg.selectAll(".axis_class").remove().exit();
 	//attempt to move circles in a straight line with transitions
-
-	var circles = svg.selectAll("circle").data(arr);
-	var speed = .5;
-	var speed_down = 1;
-	var delay = 80;
-	var pad = 20;
-	var y_scale_perc = d3.scaleLinear().domain([0,100]).range([ball_svg_height-pad, 200]);
+	full_tree_arr =	tree_arr;
+	circles = svg.selectAll("circle").data(arr);
+	speed = .5;
+	speed_down = 1;
+	delay = 80;
+	pad = 20;
+	y_scale_perc = d3.scaleLinear().domain([0,100]).range([ball_svg_height-pad, 200]);
 	var y_scale_axis = d3.axisLeft(y_scale_perc).ticks(9).tickSize(9);
-	svg.append("g").style("font", "10px times")
+	svg.append("g").attr("class", "axis_class").style("font", "10px times")
       	.call(y_scale_axis).attr("transform","translate(70,0)");	
 	var toppy = svg.append("path").attr("d", "M 205 60 L " + root_loc.x + " " + root_loc.y);
 
-	circles.enter().append("circle").attr("class", "balls_bouncing")
+	circles = circles.enter().append("circle").attr("class", "balls_bouncing")
 		.merge(circles)
 		.attr("transform", "translate(305,60)")
 		.attr("r", 4)
@@ -320,46 +330,159 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 		})
 		.style("fill", function(c, i) {
 			return "purple";})
-		.transition()
-		.duration(function(d){
-			return 10/speed;
-		})
-		.delay(function(d,i) { 
-			return delay*(n-i); })
-		.attr("transform", (d) => "translate(" + root_loc.x + "," + root_loc.y + ")")
-		
-		.transition()
-		.duration(function(d) {
-			return paths[d.data].node().getTotalLength()/speed})
-      	.attrTween("transform", function(d){
-      		return translateAlong(paths[d["data"]].node());})
-		.transition()
-		.duration(function(d){
-			l = tree_arr[0].length-1;
-			return dist(tree_arr[d["data"]][l]["x2"], tree_arr[d["data"]][l]["y2"],
-			tree_arr[d["data"]][l]["x2"], y_scale_perc(d["count"]))/speed_down;
-		
-		})
-		.attr("transform", (d) =>
-		  "translate("+tree_arr[d["data"]][l]["x2"]+","+(y_scale_perc(d["count"]))+")")
-		.transition()
-		// .duration(1000)
-		// .delay(function(d,i) {
-		// 	return delay*(i); })
-		// .attr("transform", (d) => "translate("+ (4*d["count"] + pad)+ "," +  (tree_arr[d["data"]][l]["x2"] + 200 ) +")").transition()
 		// .transition()
-		// .duration(1000)
-		// .attr("opacity", 1)
-		// .attr("transform", (d) => "translate("+ (grades_scale(d.grade)) + "," +  (tree_arr[d["data"]][l]["x2"]*2 + 200 ) +")")
-		// .transition()
-		// .attr("r", (d) => {
-		// 	category = d.data;
-		// 	grade = d.grade;
-		// 	return 1+1.5*grades_per_category[d.data][d.grade];
+		// .duration(function(d){
+		// 	return 10/speed;
 		// })
-		.on("end", function(){
-			after_transition = true;
-		});
+		// .delay(function(d,i) { 
+		// 	return delay*(n-i); })
+		// .attr("transform", (d) => "translate(" + root_loc.x + "," + root_loc.y + ")")
+		
+		// .transition()
+		// .duration(function(d) {
+		// 	return paths[d.data].node().getTotalLength()/speed})
+  //     	.attrTween("transform", function(d){
+  //     		return translateAlong(paths[d["data"]].node());})
+		// .transition()
+		// .duration(function(d){
+		// 	l = tree_arr[0].length-1;
+		// 	return dist(tree_arr[d["data"]][l]["x2"], tree_arr[d["data"]][l]["y2"],
+		// 	tree_arr[d["data"]][l]["x2"], y_scale_perc(d["count"]))/speed_down;
+		
+		// })
+		// .attr("transform", (d) =>
+		//   "translate("+tree_arr[d["data"]][l]["x2"]+","+(y_scale_perc(d["count"]))+")")
+		
+
+
+
+		// .transition()
+		// .on("end", function(){
+		// 	after_transition = true;
+		// });
 
 
 }
+
+function initial_ball_transition(){
+	//times balls so that they are going out one by one on time
+	//and move down tree
+
+	speed = .20;
+	speed_down = .5;
+	delay = 100;
+	pad = 20;
+	root_loc = {"x": 305, "y": 70};
+	n = 100;
+	category_update = category;
+	nullspace = 0;
+	console.log(circles)
+	circles.transition()
+	.attr("transform", (d) => "translate(305,60)")
+	.transition()
+	.duration(function(d){
+		console.log(speed)
+		return 10/speed;
+	})
+	.delay(function(d,i) { 
+		console.log(delay)
+		return delay*(n-i); })
+	.attr("transform", (d) => "translate(" + root_loc.x + "," + root_loc.y + ")")
+	.transition()
+	.duration(function(d) {
+		return full_paths[d.data].node().getTotalLength()/speed})
+  	.attrTween("transform", function(d){
+  		return translateAlong(full_paths[d["data"]].node());})
+	.on("end", (d,i)=>{
+		category_update[d.data].num_units -= 1;
+		nullspace += 1;
+		make_large_pie(category_update, nullspace);
+	})
+  	.transition()
+	.duration(function(d){
+	l = full_tree_arr[0].length-1;
+	return dist(full_tree_arr[d["data"]][l]["x2"], full_tree_arr[d["data"]][l]["y2"],
+	full_tree_arr[d["data"]][l]["x2"], y_scale_perc(d["count"]))/speed_down;
+	})
+	.attr("transform", (d,i) =>{
+			
+			return "translate("+tree_arr[d["data"]][l]["x2"]+","+(y_scale_perc(d["count"]))+")"
+		})
+		
+}
+
+
+function update_pie(){
+
+}
+
+
+function make_large_pie( categories, nullspace, delay){
+	pie_path = ball_svg.selectAll(".pie_fraction_path");
+	//make a large pie that will be based on data of selected dataset
+	// d3.selectAll("#pie_fraction_path").remove().exit();
+	// console.log(categories)
+	nullspace = nullspace || 0;
+	delay = delay || 0;
+
+	var total = categories.reduce((a, x) => x.num_units + a, 0) + nullspace;
+	var sofar = nullspace * 2 * Math.PI / total;
+	var cat = [{startAngle: 0, endAngle: sofar}].concat(categories.map((x) => {
+		var res = {};
+		res.startAngle = sofar;
+		res.endAngle = sofar + x.num_units * 2 * Math.PI / total;
+		sofar = res.endAngle;
+		return res;
+	}))
+
+	var color = d3.scaleOrdinal(d3.schemeCategory10);
+	var radius = 100;
+	
+	var arc = d3.arc()
+    .innerRadius(radius/2)
+    .outerRadius(radius - 20);
+
+    // console.log("yodle")
+    // console.log(categories)
+     
+	pie = d3.pie()
+	    .value(function(d) { 
+	    	return d.num_units; })
+	    .sort(null);
+
+    // var data0 = pie_path.data(),
+    //     data1 = pie(categories);
+    // console.log(arc({startAngle: 0, endAngle: 1}));
+    pie_path = pie_path.data(cat);
+
+	pie_path.enter().append("path").attr("class", "pie_fraction_path")
+    	.attr("fill", function(d, i) { return color(i); })
+	    .attr("id", function(d){ 
+	      	return "pie_section_" + d.index})
+	    .each(function(d) {this._current_angle = d; }) //store initial angles
+	    .attr("transform", "translate(" +(ball_svg_width *2/3 )+","+ (ball_svg_height*1/5)+")")
+		.merge(pie_path)
+		.transition()
+		.delay(delay)
+        .duration(15)
+        .attrTween("d", arcTween);
+
+	pie_path.exit().remove();
+
+	function arcTween(a) {
+	  var i = d3.interpolate(this._current_angle, a);
+	  this._current_angle = i(0);
+	  return function(t) {
+	    return arc(i(t));
+	  };
+	}
+
+
+	// for (var j = 0; j < categories.length - 1; j++){
+	// 	var current_section = d3.select("pie_selection_" + j);
+ // 		current_section.transition().duration(10000).attrTween("d", arcTween(4));
+	// }
+}
+
+
+
