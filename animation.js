@@ -26,12 +26,12 @@ function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_lo
 	g_ball_svg = ball_svg;
 	var rect = ball_svg.append("rect")
 		.attr("x", tree_root.x - 5)
-		.attr("y", tree_root.y - 30)
+		.attr("y", tree_root.y - 40)
 		.attr("id", "spout")
 		.attr("fill", "purple")
 		.attr("stroke", "black")
 		.attr("width", 10)
-		.attr("height", 20);
+		.attr("height", 25);
 	paths.forEach(function(path){
 		path.on("mouseover", function () {
 				data = Number(this.id.substring(this.id.indexOf("_") + 1))
@@ -109,7 +109,7 @@ function createTree(svg_id,root_loc, height, width, lower_bound, upper_bound, sp
 		.attr("x1", root_loc.x + 1)
 		.attr("y1", root_loc.y)
 		.attr("x2", root_loc.x - width/2)
-		.attr("y2", root_loc.y + height/4 - 5)
+		.attr("y2", root_loc.y + height/4 - 7)
 		.style("stroke-width", "7px")
 		.style("stroke", "green");
 
@@ -118,7 +118,7 @@ function createTree(svg_id,root_loc, height, width, lower_bound, upper_bound, sp
 		var short_l = svg_id.append("line")
 		.attr("id","tree"+ 0 + "-" + half_splits)
 		.attr("x1", root_loc.x - width/2)
-		.attr("y1", root_loc.y + height/4 - 7)
+		.attr("y1", root_loc.y + height/4 - 10)
 		.attr("x2", root_loc.x - width/2)
 		.attr("y2", root_loc.y + height/4 + 2)
 		.style("stroke-width", "7px")
@@ -132,7 +132,7 @@ function createTree(svg_id,root_loc, height, width, lower_bound, upper_bound, sp
 		.attr("x1", root_loc.x - 1)
 		.attr("y1", root_loc.y)
 		.attr("x2", root_loc.x + width/2)
-		.attr("y2", root_loc.y + height/4 - 5)
+		.attr("y2", root_loc.y + height/4 - 7)
 		.style("stroke-width", "7px")
 		.style("stroke", "red");
 
@@ -142,7 +142,7 @@ function createTree(svg_id,root_loc, height, width, lower_bound, upper_bound, sp
 		.attr("class", "estimated")
 		.attr("id", "tree"+ median + "-" + full_splits)
 		.attr("x1", root_loc.x + width/2)
-		.attr("y1", root_loc.y + height/4 - 7)
+		.attr("y1", root_loc.y + height/4 - 10)
 		.attr("x2", root_loc.x + width/2)
 		.attr("y2", root_loc.y + height/4 + 2)
 		.style("stroke-width", "7px")
@@ -285,8 +285,8 @@ function showSign(svg, data, paths, tree_arr, factor_obj, fromPath){
 		.attr("x",function(){
 			return (after_transition) ? 480 :tree_arr[data][l]["x2"] - 40;})
 		.text(
-			"Percentage:" + (category[data].final_num - category[data].num_units));		
-	svg.selectAll("circle")
+			"Percentage:" + (category[data].final_num));		
+	svg.selectAll("balls_bouncing")
 	.attr("opacity", function(d){
 		return  (d.data == data) ? 1 : .1;
 	});
@@ -298,7 +298,7 @@ function hideSign(svg, data, paths){
 
 	d3.select("#show_rect").remove();
 	d3.select("#rect_text").remove();
-	svg.selectAll("circle").attr("opacity", function(){return (after_transition == true) ? 1:1});
+	svg.selectAll("balls_bouncing").attr("opacity", function(){return (after_transition == true) ? 1:1});
 	d3.selectAll(".estimated").attr("opacity",1);
 	for (var i = 0; i < paths.length; i++){
 		paths[i].style("opacity", 0).style("stroke-opacity",0);;
@@ -306,11 +306,13 @@ function hideSign(svg, data, paths){
 }
 
 function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root_loc, paths, factor_obj){
-	svg.selectAll("circle").remove().exit();
+	// svg.selectAll("circle").remove().exit();
+	svg.selectAll(".balls_bouncing").remove().exit();
+
 	svg.selectAll(".axis_class").remove().exit();
 	//attempt to move circles in a straight line with transitions
 	full_tree_arr =	tree_arr;
-	circles = svg.selectAll("circle").data(arr);
+	circles = svg.selectAll(".balls_bouncing").data(arr);
 	speed = .5;
 	speed_down = 1;
 	delay = 80;
@@ -324,7 +326,7 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 	circles = circles.enter().append("circle").attr("class", "balls_bouncing")
 		.merge(circles)
 		.attr("transform", (d) => "translate("+(root_loc.x - 1)+ ","+ (root_loc.y-15)+")")
-		.attr("r", 6.5)
+		.attr("r", 5.5)
 		.attr("id", function (c,i){ 
 			return c.data;
 		})
@@ -337,37 +339,6 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 		.style("fill", function(c, i) {
 			console.log(category[c.data].color)
 			return color(category[c.data].color);})
-		// .transition()
-		// .duration(function(d){
-		// 	return 10/speed;
-		// })
-		// .delay(function(d,i) { 
-		// 	return delay*(n-i); })
-		// .attr("transform", (d) => "translate(" + root_loc.x + "," + root_loc.y + ")")
-		
-		// .transition()
-		// .duration(function(d) {
-		// 	return paths[d.data].node().getTotalLength()/speed})
-  //     	.attrTween("transform", function(d){
-  //     		return translateAlong(paths[d["data"]].node());})
-		// .transition()
-		// .duration(function(d){
-		// 	l = tree_arr[0].length-1;
-		// 	return dist(tree_arr[d["data"]][l]["x2"], tree_arr[d["data"]][l]["y2"],
-		// 	tree_arr[d["data"]][l]["x2"], y_scale_perc(d["count"]))/speed_down;
-		
-		// })
-		// .attr("transform", (d) =>
-		//   "translate("+tree_arr[d["data"]][l]["x2"]+","+(y_scale_perc(d["count"]))+")")
-		
-
-
-
-		// .transition()
-		// .on("end", function(){
-		// 	after_transition = true;
-		// });
-
 
 }
 
@@ -422,10 +393,10 @@ function initial_ball_transition(){
 
 
 function make_large_pie( categories, nullspace){
-	pie_path = ball_svg.selectAll(".pie_fraction_path");
 	//make a large pie that will be based on data of selected dataset
 	// d3.selectAll("#pie_fraction_path").remove().exit();
 	// console.log(categories)
+	pie_path = ball_svg.selectAll(".pie_fraction_path");
 	nullspace = nullspace || 0;
 	delay = delay || 0;
 
@@ -479,12 +450,90 @@ function make_large_pie( categories, nullspace){
 	  };
 	}
 }
-
-
-function make_vienn_diagram(){
+sofar_mini = []
+total_mini = []
+cat_mini = []
+res_mini = []
+mini_pie = []
+mini_pie_path = []
+arc_mini = []
+called_boolean_pies = 0;
+function make_boolean_pies(ind, question){
 
 	// ball_svg.append("circle")
+	mini_pie_path[ind] = ball_svg.selectAll(".mini_pie_fraction_path_"+ind);
+	total_mini[ind] = function_data_arr[ind].reduce((a, x) => x + a, 0);
+	sofar_mini[ind] = 0;
+	cat_mini[ind] = function_data_arr[ind].map((x) => {
+		console.log(x)
+		res_mini[ind] = {};
+		res_mini[ind].startAngle = sofar_mini[ind];
+		res_mini[ind].endAngle = sofar_mini[ind] + x * 2 * Math.PI / total_mini[ind];
+		sofar_mini[ind] = res_mini[ind].endAngle;
+		return res_mini[ind];
+	})
+	var radius_mini = 20;
+	
+	arc_mini[ind] = d3.arc()
+    .innerRadius(radius_mini/2)
+    .outerRadius(radius_mini);
 
+	mini_pie[ind] = d3.pie()
+	    .value(function(d) { 
+	    	return d; })
+	    .sort(null);
+
+    mini_pie_path[ind] = mini_pie_path[ind].data(cat_mini[ind]);
+
+	mini_pie_path[ind].enter().append("path").attr("class", "mini_pie_fraction_path_"+ind + " mini_pie_fraction_path")
+    	.attr("fill", function(d, i) { 
+    		console.log(tree_arr)
+    		return (i==0) ? 'green' : 'red'; })
+	    .attr("id", function(d){ 
+	      	return "pie_section_" + ind})
+	    .each(function(d) {this._current_angle = d; }) //store initial angles
+	    .attr("transform", "translate(" +(tree_arr[0][ind].x1+ 1/2*(tree_arr[0][ind].x2-tree_arr[0][ind].x1) - 60)+","+
+	    (tree_arr[0][ind].y1+ 1/2*(tree_arr[0][ind].y2-tree_arr[0][ind].y1) )+")")
+		.merge(mini_pie_path[ind])
+		.transition()
+		// .delay(delay)
+        .duration(2000)
+        .attrTween("d", arcTween);
+     
+
+	if (called_boolean_pies < factor_obj.factor_arr.length){
+	    text_for_mini_pie = ball_svg.append("text")
+	    .attr("class", "mini_pie_"+ind+"_text")
+	    .attr("class", "mini_pie_"+ind+"_text mini_pie_text")
+	    .text(question)
+	    .style("font", "14px times")
+		.attr("x", ()=>{ 
+			return tree_arr[0][ind].x1+ 1/2*(tree_arr[0][ind].x2-tree_arr[0][ind].x1) - 90;
+		})
+		.attr("y", tree_arr[0][ind].y1+ 1/2*(tree_arr[0][ind].y2-tree_arr[0][ind].y1) - 20);
+	}
+	else{
+		class_text_name  = ".mini_pie_" + ind+"_text"
+		stuff = d3.selectAll(class_text_name)
+		d3.selectAll(class_text_name).text(question)
+	}
+	function arcTween(a) {
+	  var i = d3.interpolate(this._current_angle, a);
+	  this._current_angle = i(0);
+	  return function(t) {
+	    return arc_mini[ind](i(t));
+	  };
+	}
+	called_boolean_pies += 1;
 }
 
-
+function make_venn_diagram(){
+	for (var venn_i = 0; venn_i < 3; venn_i++){
+		ball_svg.append("circle")
+		.attr("class", "venn_circle")
+		.attr("transform", "translate("+(50+18*venn_i)+","+ (90 - ((venn_i == 1) ? 30: 0))+")")
+		.attr("r", 40)
+		.attr("fill",()=> (venn_i==0) ? "cyan": (venn_i == 1)? "yellow": "magenta")
+		.attr("opacity", 0.7);
+	}
+}

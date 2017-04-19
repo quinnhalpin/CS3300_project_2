@@ -8,6 +8,9 @@
 	svg { border: solid #ccc 1px; }
 	body { font-family: 'Alegreya Sans', Calibri, sans-serif; }
 	.words {width : 700px;}
+	.mini_pie_text{
+		text-align:right;
+	}
 	#container{
 	  position: relative;
 	  overflow: auto;
@@ -215,21 +218,20 @@
 				normalized_dataset["ball_data"].push(j);	
     		}
     	}
+    	//make a global variable [function_data_arr] that stores for each boolean
+    	//function the percent of people who evaluate to true;
+    	function_data_arr = chosen_functions.map(f=>{ 
+    		acc = 0;
+    		console.log(dataset)
+    		for (var k = 0; k < dataset.length; k++){
+    			acc += f(dataset[k])
+    		}
+    		yes_val = Math.round(100*acc/dataset.length);
+    		return [yes_val, 100-yes_val]; 
+    	})
 
-    	// function_data_arr = chosen_functions.reduce(f=>{ 
-    	// 	acc = 0;
-    	// 	arr = dataset.forEach(function(data_unit){
-    	// 		acc += (f(data_unit)) ? 1:0;
-    	// 	})
-    	// 	return arr; 
-    	// 	})
-
-    	// console.log(function_data_arr)
-
-    	//d3.shuffle(normalized_dataset["ball_data"])
     	normalized_dataset["special_param"] = category.map(x=> x.per_yes_special);
     	make_large_pie(category);
-			
     	return normalized_dataset;
 
     }
@@ -378,7 +380,7 @@
 		var temp_dataset_selectors = [select_dataset];
 		add_selector_values(temp_arr_selectors, Object.keys(temp_questions_data), 0)
 		add_selector_values(temp_dataset_selectors, Object.keys(temp_dataset_questions), 0)
-
+		make_venn_diagram();
 		var created_tree = false;
 		var paths;
 		
@@ -411,7 +413,12 @@
 			if (created_tree == false){
 				tree_arr = createTreeBegin(ball_svg, tree_root, 300, 300, splits);
 				paths = createTreePath(ball_svg, tree_arr);
+
 			}
+			make_boolean_pies(0, factor_obj["shortened_arr"][0]);
+			make_boolean_pies(1, factor_obj["shortened_arr"][1]);
+			make_boolean_pies(2, factor_obj["shortened_arr"][2]);
+
 			spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, tree_root,normalized_dataset, factor_obj, paths);
 			// spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, tree_root,student_math, factor_obj, paths);
  			addStrings(ball_svg_height, ball_svg_width, tree_arr, ball_svg, factor_obj["questions_arr"]);		
