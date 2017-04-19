@@ -23,8 +23,8 @@
 
 	#ball_animation{
 	  width: 900px;
-	  top:100;
-	  left: 400;
+	  top:50;
+	  left: 250;
 	  position:fixed;
 	  margin-left: 40px;
 	}
@@ -186,9 +186,9 @@
     	//given a dataset, determine how many people are in a category and normalize
     	//determine number of people in each category
     	category = [];
-
+    	color = d3.scaleOrdinal(d3.schemeCategory10);
     	for (var i= 0;i < Math.pow(2,chosen_functions.length); i++){
-    		category.push({"num_units": 0, "per_yes_special":0, "final_num": 0});
+    		category.push({"num_units": 0, "per_yes_special":0, "final_num": 0, "color": color(i)});
     	}
     	//special param is an array by category index and holds % yes for that category
     	normalized_dataset = {"ball_data": [], "special_param": []};
@@ -230,8 +230,8 @@
  		student_math = math;
  		student_por = portugal;
  		student_int = international;
- 		ball_svg_height = 600;
-		ball_svg_width = 900;
+ 		ball_svg_height = 800;
+		ball_svg_width = 1200;
 		
 		ball_svg = d3.select("#ball_animation").append("svg")
 		.attr("height", ball_svg_height)
@@ -375,7 +375,9 @@
 		
 		//trigger tree for page load
 		if (!called_see_tree) see_tree();
-
+		// else{
+		// 	d3.select(circle).transition();
+		// }
 		//trigger tree for any values selectors changing
 		d3.selectAll("select").on("change", see_tree);
 		
@@ -392,11 +394,13 @@
 			})
 			special_fun = questions_data[special_selector.property("value")][0];
 			special_short_quest = questions_data[special_selector.property("value")][1];
-			var tree_root = {"x": 305, "y": 70};
+			tree_root = {"x": ball_svg_width/2, "y": ball_svg_height*.1};
+
+			// var tree_root = {"x": 305, "y": 70};
 			var splits = Math.pow(2, factor_obj["factor_arr"].length)
 			var normalized_dataset = normalize(student_math,factor_obj["factor_arr"], special_fun);
 			if (created_tree == false){
-				tree_arr = createTreeBegin(ball_svg, tree_root, 200, 200, splits);
+				tree_arr = createTreeBegin(ball_svg, tree_root, 400, 400, splits);
 				paths = createTreePath(ball_svg, tree_arr);
 			}
 			spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, tree_root,normalized_dataset, factor_obj, paths);

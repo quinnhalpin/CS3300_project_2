@@ -25,8 +25,8 @@ function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_lo
 	outside_tree = tree_arr;
 	g_ball_svg = ball_svg;
 	var rect = ball_svg.append("rect")
-		.attr("x", 300)
-		.attr("y", 40)
+		.attr("x", tree_root.x - 5)
+		.attr("y", tree_root.y - 30)
 		.attr("id", "spout")
 		.attr("fill", "purple")
 		.attr("stroke", "black")
@@ -110,7 +110,7 @@ function createTree(svg_id,root_loc, height, width, lower_bound, upper_bound, sp
 		.attr("y1", root_loc.y)
 		.attr("x2", root_loc.x - width/2)
 		.attr("y2", root_loc.y + height/4 - 5)
-		.style("stroke-width", "5px")
+		.style("stroke-width", "7px")
 		.style("stroke", "green");
 
 		setClasses(long_l, lower_bound, middle);
@@ -121,7 +121,7 @@ function createTree(svg_id,root_loc, height, width, lower_bound, upper_bound, sp
 		.attr("y1", root_loc.y + height/4 - 7)
 		.attr("x2", root_loc.x - width/2)
 		.attr("y2", root_loc.y + height/4 + 2)
-		.style("stroke-width", "5px")
+		.style("stroke-width", "7px")
 		.style("stroke", "green");
 
 		setClasses(short_l, lower_bound, middle);
@@ -133,7 +133,7 @@ function createTree(svg_id,root_loc, height, width, lower_bound, upper_bound, sp
 		.attr("y1", root_loc.y)
 		.attr("x2", root_loc.x + width/2)
 		.attr("y2", root_loc.y + height/4 - 5)
-		.style("stroke-width", "5px")
+		.style("stroke-width", "7px")
 		.style("stroke", "red");
 
 		setClasses(long_r, median, upper_bound)
@@ -145,7 +145,7 @@ function createTree(svg_id,root_loc, height, width, lower_bound, upper_bound, sp
 		.attr("y1", root_loc.y + height/4 - 7)
 		.attr("x2", root_loc.x + width/2)
 		.attr("y2", root_loc.y + height/4 + 2)
-		.style("stroke-width", "5px")
+		.style("stroke-width", "7px")
 		.style("stroke", "red");
 
 		setClasses(short_r, median, upper_bound)
@@ -315,7 +315,7 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 	speed_down = 1;
 	delay = 80;
 	pad = 20;
-	y_scale_perc = d3.scaleLinear().domain([0,100]).range([ball_svg_height-pad, 200]);
+	y_scale_perc = d3.scaleLinear().domain([0,100]).range([ball_svg_height-pad, tree_arr[0][2]["y2"] + 20]);
 	var y_scale_axis = d3.axisLeft(y_scale_perc).ticks(9).tickSize(9);
 	svg.append("g").attr("class", "axis_class").style("font", "10px times")
       	.call(y_scale_axis).attr("transform","translate(70,0)");	
@@ -323,8 +323,8 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 
 	circles = circles.enter().append("circle").attr("class", "balls_bouncing")
 		.merge(circles)
-		.attr("transform", "translate(305,60)")
-		.attr("r", 4)
+		.attr("transform", (d) => "translate("+(root_loc.x - 1)+ ","+ (root_loc.y-15)+")")
+		.attr("r", 6.5)
 		.attr("id", function (c,i){ 
 			return c.data;
 		})
@@ -335,7 +335,8 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 			hideSign(svg, c.data, paths);
 		})
 		.style("fill", function(c, i) {
-			return color(c.data+1);})
+			console.log(category[c.data].color)
+			return color(category[c.data].color);})
 		// .transition()
 		// .duration(function(d){
 		// 	return 10/speed;
@@ -379,13 +380,14 @@ function initial_ball_transition(){
 	speed_down = .5;
 	delay = 100;
 	pad = 20;
-	root_loc = {"x": 305, "y": 70};
+	// root_loc = {"x": 305, "y": 70};
+	root_loc = {"x": ball_svg_width/2, "y": ball_svg_height*.1};
+
 	n = 100;
 	category_update = category;
 	nullspace = 0;
-	console.log(circles)
 	circles.transition()
-	.attr("transform", (d) => "translate(305,60)")
+	.attr("transform", (d) => "translate("+(root_loc.x - 1)+ ","+ (root_loc.y-15)+")")
 	.transition()
 	.duration(function(d){
 		console.log(speed)
@@ -419,12 +421,7 @@ function initial_ball_transition(){
 }
 
 
-function update_pie(){
-
-}
-
-
-function make_large_pie( categories, nullspace, delay){
+function make_large_pie( categories, nullspace){
 	pie_path = ball_svg.selectAll(".pie_fraction_path");
 	//make a large pie that will be based on data of selected dataset
 	// d3.selectAll("#pie_fraction_path").remove().exit();
@@ -442,32 +439,30 @@ function make_large_pie( categories, nullspace, delay){
 		return res;
 	}))
 
-	color = d3.scaleOrdinal(d3.schemeCategory10);
-	var radius = 100;
+	
+	var radius = 130;
 	
 	var arc = d3.arc()
     .innerRadius(radius/2)
     .outerRadius(radius - 20);
 
-    // console.log("yodle")
-    // console.log(categories)
-     
 	pie = d3.pie()
 	    .value(function(d) { 
 	    	return d.num_units; })
 	    .sort(null);
 
-    // var data0 = pie_path.data(),
-    //     data1 = pie(categories);
-    // console.log(arc({startAngle: 0, endAngle: 1}));
     pie_path = pie_path.data(cat);
 
 	pie_path.enter().append("path").attr("class", "pie_fraction_path")
-    	.attr("fill", function(d, i) { console.log(i);return (i==0) ? '#dddddd' : color(i); })
+    	.attr("fill", function(d, i) { 
+    		if (i!=0){
+    			console.log(categories[i-1].color)	
+    		}
+    		 return (i==0) ? '#dddddd' : categories[(i-1)].color; })
 	    .attr("id", function(d){ 
 	      	return "pie_section_" + d.index})
 	    .each(function(d) {this._current_angle = d; }) //store initial angles
-	    .attr("transform", "translate(" +(ball_svg_width *2/3 )+","+ (ball_svg_height*1/5)+")")
+	    .attr("transform", "translate(" +(ball_svg_width *.9 )+","+ (ball_svg_height*1/5)+")")
 		.merge(pie_path)
 		.transition()
 		.delay(delay)
