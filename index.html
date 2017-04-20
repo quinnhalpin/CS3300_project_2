@@ -5,11 +5,38 @@
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
 <style>
+    
+#sections {
+  position: relative;
+  display: inline-block;
+  width: 250px;
+  top: 0px;
+  z-index: 90;
+  padding-bottom: 200px;
+}
+
+.step {
+  margin-bottom: 200px;
+  font-family: "TiemposTextWeb-Regular","Georgia";
+  font-size: 16px;
+  line-height: 23px;
+  color: #767678;
+}
+
+#sections .title {
+  font-family: Arial,Helvetica,"san-serif";
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 2px;
+  color: #262626;
+  line-height: 1.2em;
+}
+    
 	svg { border: solid #ccc 1px; }
-	body { font-family: 'Alegreya Sans', Calibri, sans-serif; }
+	body { font-family: 'Alegreya Sans', Calibri, sans-serif; background-color: #F1EBDF;}
 	.words {width : 700px;}
 	.mini_pie_text{
-		text-align:right;
+		text-align:center;
 	}
 	#container{
 	  overflow: auto;
@@ -21,14 +48,18 @@
 	}
 	#text_for_scroll{
 	  width: 200px;
-	  float: left;
+	  float: right;
+      right: 140;
 	}
 
 	#ball_animation{
-	  width: 800px;
+	  width: 500px;
 	  top:50;
-	  left: 230;
+	  left: 20;
 	  margin-left: 40px;
+      position:fixed;
+      float: left;
+      background-color: #F1EBDF;
 	}
 
 </style>
@@ -37,7 +68,11 @@
 
 	
 </div><div id = "container">
-	<div id = "selector_div">
+        <div id = "text_for_scroll">
+        <div id='sections'>
+        <section class = "step">
+            <div class = "title">Data Selection</div>
+            <div id = "selector_div">
 		Pick Dataset:<br>
 		<select id = "dataset">
 		</select><br><br>
@@ -50,7 +85,45 @@
 		Third Boolean Variable<br>
 		<select id = "selector_3">
 		</select><br><br>
-		<button id="see_tree_button">See Tree</button>
+		<button id="see_tree_button">See Tree</button><br><br>
+                </section>
+      <section class="step">
+        <div class="title">Step</div>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis, eros sit amet pellentesque consectetur, enim sapien tincidunt ante, a finibus elit libero non ex. Suspendisse potenti.
+      </section>
+      <section class="step">
+        <div class="title">Step</div>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis, eros sit amet pellentesque consectetur, enim sapien tincidunt ante, a finibus elit libero non ex. Suspendisse potenti.
+      </section>
+      <section class="step">
+        <div class="title">Step</div>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis, eros sit amet pellentesque consectetur, enim sapien tincidunt ante, a finibus elit libero non ex. Suspendisse potenti.
+      </section>
+      <section class="step">
+        <div class="title">Step</div>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis, eros sit amet pellentesque consectetur, enim sapien tincidunt ante, a finibus elit libero non ex. Suspendisse potenti.
+      </section>
+      <section class="step">
+        <div class="title">Step</div>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis, eros sit amet pellentesque consectetur, enim sapien tincidunt ante, a finibus elit libero non ex. Suspendisse potenti.
+      </section>
+      <section class="step">
+        <div class="title">Step</div>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis, eros sit amet pellentesque consectetur, enim sapien tincidunt ante, a finibus elit libero non ex. Suspendisse potenti.
+      </section>
+      <section class="step">
+        <div class="title">Step</div>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis, eros sit amet pellentesque consectetur, enim sapien tincidunt ante, a finibus elit libero non ex. Suspendisse potenti.
+      </section>
+      <section class="step">
+        <div class="title">Step</div>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis, eros sit amet pellentesque consectetur, enim sapien tincidunt ante, a finibus elit libero non ex. Suspendisse potenti.
+      </section>
+      <section class="step">
+        <div class="title">Step</div>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis, eros sit amet pellentesque consectetur, enim sapien tincidunt ante, a finibus elit libero non ex. Suspendisse potenti.
+      </section>
+    </div>
 	</div>
 	<div id = "ball_animation"></div>
 
