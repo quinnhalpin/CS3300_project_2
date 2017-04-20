@@ -193,7 +193,7 @@ function addStrings(ball_svg_height, ball_svg_width, tree_arr, svg, question_arr
 	var pad = 200;
 	tree_text = d3.selectAll(".tree_text")
 	for (var i = 0; i < question_arr.length; i++){
-		tree_text.append("text").style("font", "10px times").attr("class","tree_text")
+		tree_text.append("text").style("font", "10px Verdana").attr("class","tree_text")
 		.text(question_arr[i])
 		.attr("x", ball_svg_width- 1.5*pad)
 		.attr("y", tree_arr[0][i]["y1"]);
@@ -233,10 +233,10 @@ function showSign(svg, data, paths, tree_arr, factor_obj, fromPath){
 		.attr("stroke", "black")
 		.attr("width", 150)
 		.attr("height", 100);
-	var text = svg.append("text").style("font", "20px times")
+	var text = svg.append("text").style("font", "20px Verdana")
 		.attr("id", "rect_text")
 		.html("")
-		.style("font", "14px times")
+		.style("font", "14px Verdana")
 		.attr("y", function() { return tree_arr[data][l]["y2"] + 70});
 
 	var max_width = 100;
@@ -303,7 +303,7 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 	pad = 20;
 	y_scale_perc = d3.scaleLinear().domain([0,100]).range([ball_svg_height-pad, tree_arr[0][2]["y2"] + 20]);
 	var y_scale_axis = d3.axisLeft(y_scale_perc).ticks(9).tickSize(9);
-	svg.append("g").attr("class", "axis_class").style("font", "10px times")
+	svg.append("g").attr("class", "axis_class").style("font", "10px verdana")
       	.call(y_scale_axis).attr("transform","translate(70,0)");	
 
 	var toppy = svg.append("path").attr("d", "M 205 60 L " + root_loc.x + " " + root_loc.y);
@@ -499,7 +499,8 @@ function make_boolean_pies(ind, question){
 	    .attr("class", "mini_pie_"+ind+"_text mini_pie_text")
 	    .attr("text_anchor","middle")
 	    .text(question)
-	    .style("font", "14px times")
+	    .style("font", "14px")
+	    .style("font-family", "verdana")
 		.attr("x", ()=>{ 
 			return tree_arr[0][ind].x1+ 1/2*(tree_arr[0][ind].x2-tree_arr[0][ind].x1) - 60;
 		})
