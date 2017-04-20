@@ -31,7 +31,7 @@
   color: #262626;
 }
 
-svg { border: solid #ccc 1px; }
+/*svg { border: solid #ccc 1px; }*/
 body { font-family: 'Alegreya Sans', Calibri, sans-serif; background-color: #F1EBDF;}
 .words {width : 700px;}
 .mini_pie_text{

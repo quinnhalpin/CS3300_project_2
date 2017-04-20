@@ -25,14 +25,6 @@ function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_lo
 	full_paths = paths;
 	outside_tree = tree_arr;
 	g_ball_svg = ball_svg;
-	// var rect = ball_svg.append("rect")
-	// 	.attr("x", tree_root.x - 5)
-	// 	.attr("y", tree_root.y - 40)
-	// 	.attr("id", "spout")
-	// 	.attr("fill", "none")
-	// 	.attr("stroke", "black")
-	// 	.attr("width", 10)
-	// 	.attr("height", 25);
 	paths.forEach(function(path){
 		path.on("mouseover", function () {
 				data = Number(this.id.substring(this.id.indexOf("_") + 1))
@@ -247,15 +239,15 @@ function showSign(svg, data, paths, tree_arr, factor_obj, fromPath){
 	//[showSign] shows the sign that will have the questions in it
 	l = tree_arr[0].length-1;
 
-	// var rect = svg.append("rect")
-	// 	.attr("id", "show_rect")
-	// 	.attr("x", function(){
-	// 		return (fromPath) ? tree_arr[data][l]["x2"] - 50: tree_arr[data][l]["x2"] -50;})
-	// 	.attr("y", function() { return tree_arr[data][l]["y2"] + 70})
-	// 	.attr("fill", "#F4EDE3")
-	// 	.attr("stroke", "black")
-	// 	.attr("width", 150)
-	// 	.attr("height", 100);
+	var rect = svg.append("rect")
+		.attr("id", "show_rect")
+		.attr("x", function(){
+			return (fromPath) ? tree_arr[data][l]["x2"] - 50: tree_arr[data][l]["x2"] -50;})
+		.attr("y", function() { return tree_arr[data][l]["y2"] + 70})
+		.attr("fill", "#F4EDE3")
+		.attr("stroke", "black")
+		.attr("width", 150)
+		.attr("height", 100);
 	var text = svg.append("text").style("font", "20px times")
 		.attr("id", "rect_text")
 		.html("")
