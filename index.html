@@ -442,6 +442,11 @@
 			created_tree = true
 			initial_ball_transition(d3.select("#see_tree_button"));
 
+			ball_svg.append("rect")
+				.attr("height", "35")
+				.attr("width", "800")
+				.attr("fill", "#F1EBDF")
+
 			ball_svg.append("text")
 				.attr("transform", "translate("+ball_svg_width/2+",26)")
 				.attr("fill", "black")
