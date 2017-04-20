@@ -285,7 +285,7 @@ function showSign(svg, data, paths, tree_arr, factor_obj, fromPath){
 		.attr("x",function(){
 			return (after_transition) ? 480 :tree_arr[data][l]["x2"] - 40;})
 		.text(
-			"Percentage:" + (category[data].final_num));		
+			(category[data].final_num)+ "%");		
 	svg.selectAll("balls_bouncing")
 	.attr("opacity", function(d){
 		return  (d.data == data) ? 1 : .1;

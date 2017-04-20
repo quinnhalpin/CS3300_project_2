@@ -12,10 +12,10 @@
 		text-align:right;
 	}
 	#container{
-	  position: relative;
 	  overflow: auto;
 	}
 	#selector_div{
+	  font-size: 12px;
 	  float: right;
 	  overflow: auto;
 	}
@@ -25,29 +25,33 @@
 	}
 
 	#ball_animation{
-	  width: 900px;
+	  width: 800px;
 	  top:50;
 	  left: 230;
-	  position:fixed;
 	  margin-left: 40px;
 	}
 
 </style>
 </head>
 <body>
-<div id = "selector_div">
-	<select id = "dataset">
-	</select><br>
-	<select id = "selector_1">
-	</select><br>
-	<select id = "selector_2">
-	</select><br>
-	<select id = "selector_3">
-	</select><br>
-	<select id = "special_selector">
-	</select>
-	<!-- <button id="see_tree">See Tree</button> -->
+
+	
 </div><div id = "container">
+	<div id = "selector_div">
+		Pick Dataset:<br>
+		<select id = "dataset">
+		</select><br><br>
+		First Boolean Variable:<br>
+		<select id = "selector_1">
+		</select><br><br>
+		Second Boolean Variable:<br>
+		<select id = "selector_2">
+		</select><br><br>
+		Third Boolean Variable<br>
+		<select id = "selector_3">
+		</select><br><br>
+		<button id="see_tree_button">See Tree</button>
+	</div>
 	<div id = "ball_animation"></div>
 
 	<div id = "text_for_scroll">
@@ -134,9 +138,10 @@
 	}
 
 	function parseInternationalStudents(row) {
-		row.gender = (row.gender == "Male") ? 1 : 0;
-		row.StudentAbsenceDays = (row.StudentAbsenceDays == "Above-7") ? 1: 0;
-		row.ParentschoolSatisfaction = (row.ParentschoolSatisfaction == "Good") ? 1: 0;
+		row.gender = (row.gender=="M") ? 1:0;
+		row.StudentAbsenceDays = (row.StudentAbsenceDays > 7) ? 1: 0;
+		row.ParentschoolSatisfaction = row.ParentschoolSatisfaction== "Good" ? 1: 0;
+		return row;
 	}
 
  	d3.queue()
@@ -185,7 +190,7 @@
     	return cat_ind;
     }
 
-    function normalize(dataset, chosen_functions, special_funct){
+    function normalize(dataset, chosen_functions){
     	//given a dataset, determine how many people are in a category and normalize
     	//determine number of people in each category
     	category = [];
@@ -193,14 +198,17 @@
     	for (var i= 0;i < Math.pow(2,chosen_functions.length); i++){
     		category.push({"num_units": 0, "per_yes_special":0, "final_num": 0, "color": color(i)});
     	}
+    	
     	//special param is an array by category index and holds % yes for that category
     	normalized_dataset = {"ball_data": [], "special_param": []};
     	dataset.forEach(function(p){
+    		// console.log(chosen_functions)
     		var cat_ind = determineCategory(chosen_functions, p);
+    		// console.log(p)
+    		// console.log("in dataset finder")
+    		// console.log(cat_ind)
     		//add to the number of people in this category
     		category[cat_ind].num_units += 1;
-    		//add to the number of yes people for this category
-    		category[cat_ind].per_yes_special += (special_funct(p)) ? 1 : 0;
     	})
     	category.forEach(function(category_value, cat_ind){
     		//define percent of yes according to special function for this category
@@ -222,7 +230,6 @@
     	//function the percent of people who evaluate to true;
     	function_data_arr = chosen_functions.map(f=>{ 
     		acc = 0;
-    		console.log(dataset)
     		for (var k = 0; k < dataset.length; k++){
     			acc += f(dataset[k])
     		}
@@ -233,21 +240,23 @@
     	normalized_dataset["special_param"] = category.map(x=> x.per_yes_special);
     	make_large_pie(category);
     	return normalized_dataset;
-
+    	
     }
-
 
  	function load_data(error, math, portugal, international, speeddating){
  		student_math = math;
  		student_por = portugal;
  		student_int = international;
+ 		speed_dating = speeddating;
  		ball_svg_height = 600;
 		ball_svg_width = 800;
 		
 		ball_svg = d3.select("#ball_animation").append("svg")
 		.attr("height", ball_svg_height)
 		.attr("width", ball_svg_width);
-
+		find_dataset = {"High school student data in Portugal":student_math, 
+		"International students data": student_int, 
+		"Speed dating in Colombia": speed_dating};
 		databases = {};
 		databases["High school student data in Portugal"] = "math";
 		databases["International students data"] = "int";
@@ -298,27 +307,26 @@
 
 		//SPEEDDATING
 		function isMaleDate(person){
-			return person.gender;
+			return Number(person.gender);
 		}
 		function valuesRace(person){
-			return person.imprace >= 6;
+			return Number(person.imprace) >= 6;
 		}
 		function valuesReligion(person){
-			return person.impreligion >=6;
+			return Number(person.imprelig) >=6;
 		}
 		function datesFrequently(person){
 			//if a person goes on dates more than once a month
-			return person.date <=5;
+			return Number(person.date) <=5;
 		}
 
 		data_dict["dating"] = [isMaleDate, valuesRace, valuesReligion, datesFrequently];
 		
 		var curr_hue = 1;
-		d3.select("#see_grades").on("click", function() {see_grades(ball_svg)});
 		d3.select("#user_input").append("text").style("font", "17px times")
 		.text("Speed");
 
-		var questions_data_math = {
+		var questions_data_dict = {"math":{
 			"Does the student do extracurriculars?": [hasActivities, "Extracurriculars"],
 			"Does the student live in urban environment?": [liveInCity, "Urban Area"],
 			"Does the student have internet?": [hasInternet, "Internet"],
@@ -326,109 +334,125 @@
 			"Did the student go to higher education?": [isHigher, "Higer Education"],
 			"Did the student go to nursery school?": [hasNursery, "Nursery"],
 			"Do the parents live apart?": [parentsApart, "Parents Apart"]
-			}
+			},
 
-		var questions_data_int ={
+		"int":{
 			"Is the student male?": [isMale, "Male"],
 			"Does the student have more than 7 absences?": [manyAbsences, "Many absences"],
 			"Are the student's parents satisfied with their school?": [parentsSatisfied, "Parents satisfied"],
 			"Does the student get high grades?": [highGrades, "High grades"],
 			"Does the student get low grades?": [lowGrades, "Low grades"]
-		}
+		},
 
-		var questions_data_date = {
+		"dating":{
 			"Is the subject male?": [isMaleDate, "Male"],
 			"Does the participant prefer a partner who is the same race as them?": [valuesRace, "Values same race"],
 			"Does the participant prefer a partner who is the same religion as them?": [valuesReligion, "Values same religion"],
 			"Does the participant date more than once a month?": [datesFrequently, "Dates more than once a month"]
-		}
+		}}
 
 		//TEMPORARY
-		//questions_data = questions_data_math;
+		questions_data = questions_data_dict["math"];
 
 		d3.graphScroll()
 			.graph(d3.selectAll('#ball_svg'))
 			.container(d3.select('#container'))
 		  	.sections(d3.selectAll('#text_for_scroll > div' ))
-		  	.on('active', function(i){ console.log(i + 'th section active') })
+		  	.on('active', function(i){})
 
 
-		function add_selector_values(selector_arr, questions, questions_ind){
+		function add_selector_values(selector_arr, questions){
 			//adds values to selectors
-			if (selector_arr.length <=0) return;
-			var selector = selector_arr[0]
-			selector.on("change", function(x){})
-				.selectAll("option").data(questions).enter().append("option")
-				.text(d=>d)
-			selector.select("options").attr("defaultSelected",true);
-			var head = questions.shift()
-			questions.push(head)
-			selector_arr.shift()
-			add_selector_values(selector_arr, questions, questions_ind + 1)
+			temp_questions = questions;
+			selector_arr.forEach(function(selector, questions_ind){
+				selector.selectAll("option").remove()
+				selector.on("change", function(x){})
+					.selectAll("option").data(temp_questions).enter().append("option")
+					.text(d=>d)
+				selector.select("options").attr("defaultSelected",true);
+				var head = temp_questions.shift()
+				temp_questions.push(head)
+			})
 		}
 
 		var selector_1 = d3.select("#selector_1");
 		var selector_2 = d3.select("#selector_2");
 		var selector_3 = d3.select("#selector_3");
-		var special_selector = d3.select("#special_selector");
 		var select_dataset = d3.select("#dataset");
 
 		var all_selectors = [selector_1, selector_2, selector_3]
-		var temp_arr_selectors = [selector_1, selector_2, selector_3, special_selector];
-		questions_data = questions_data_math;
-		var temp_questions_data = questions_data;
+		var temp_arr_selectors = [selector_1, selector_2, selector_3];
+		var temp_questions_data = questions_data_dict["math"];
+		// var temp_questions_data = data_dict[databases[select_dataset.property("value")]];
 		var temp_dataset_questions = databases;
 		var temp_dataset_selectors = [select_dataset];
-		add_selector_values(temp_arr_selectors, Object.keys(temp_questions_data), 0)
-		add_selector_values(temp_dataset_selectors, Object.keys(temp_dataset_questions), 0)
+		add_selector_values(temp_arr_selectors, Object.keys(temp_questions_data))
+		add_selector_values(temp_dataset_selectors, Object.keys(temp_dataset_questions))
 		make_venn_diagram();
 		var created_tree = false;
 		var paths;
 		
 		//trigger tree for page load
 		if (!called_see_tree) see_tree();
+
+
+
+
+
 		// else{
 		// 	d3.select(circle).transition();
 		// }
 		//trigger tree for any values selectors changing
-		d3.selectAll("select").on("change", see_tree);
+		d3.selectAll("#dataset").on("change", ()=>{
+			var curr_dataset = select_dataset.property("value")
+			var curr_dataset_object = questions_data_dict[databases[curr_dataset]]
+			var temp_dataset_selectors = all_selectors;
+			var temp_dataset_questions = curr_dataset_object;
+			add_selector_values(temp_dataset_selectors, Object.keys(temp_dataset_questions),0);
+		});
+		// d3.selectAll("select").on("change", see_tree);
+		d3.select("#see_tree_button").on("click", see_tree);
 		
-		function see_tree(){
+		function see_tree(e){
 			called_see_tree = true;
 			factor_obj ={"factor_arr": [], "questions_arr":[], "shortened_arr": []};
 			var funct, shorten_q, question;
-			console.log(questions_data);
-			var dataset_choice = select_dataset.property("value");
-			console.log("DATA CHOICE IS HERE");
-			if (dataset_choice == "International students data"){
-				questions_data = questions_data_int;
-			}
-			if (dataset_choice == "High school student data in Portugal"){
-				questions_data = questions_data_math;
-			}
+			// console.log(questions_data);
+			var dataset_name = select_dataset.property("value");
+			console.log(dataset_name)
+
+			var curr_dataset_object = questions_data_dict[databases[dataset_name]];
+			console.log("dataset_choice"+ dataset_name)
+			// console.log("DATA CHOICE IS HERE");
+			// if (dataset_choice == "International students data"){
+			// 	questions_data = questions_data_int;
+			// }
+			// if (dataset_choice == "High school student data in Portugal"){
+			// 	questions_data = questions_data_math;
+			// }
 
 			//var temp_questions_data = questions_data;
 			//var temp_dataset_questions = databases;
-			//var temp_dataset_selectors = [select_dataset];
-			temp_questions_data = questions_data;
-			add_selector_values(temp_arr_selectors, Object.keys(temp_questions_data), 0)
-			add_selector_values(temp_dataset_selectors, Object.keys(temp_dataset_questions), 0)
+			// var temp_dataset_selectors = [select_dataset];
+			// temp_questions_data = questions_data;
+			// add_selector_values(temp_arr_selectors, Object.keys(temp_questions_data), 0)
+			// add_selector_values(temp_dataset_selectors, Object.keys(temp_dataset_questions), 0)
 
 			all_selectors.forEach(function(selector){
 				question = selector.property("value");
-				console.log(question);
-				factor_obj["factor_arr"].push(questions_data[question][0]);
+				console.log("question" + question);
+				factor_obj["factor_arr"].push(curr_dataset_object[question][0]);
 				factor_obj["questions_arr"].push(question);
-				factor_obj["shortened_arr"].push(questions_data[question][1]);
+				factor_obj["shortened_arr"].push(curr_dataset_object[question][1]);
 			})
-
-			special_fun = questions_data[special_selector.property("value")][0];
-			special_short_quest = questions_data[special_selector.property("value")][1];
+			console.log(all_selectors)
+			// special_fun = questions_data[special_selector.property("value")][0];
+			// special_short_quest = questions_data[special_selector.property("value")][1];
 			tree_root = {"x": ball_svg_width/2, "y": ball_svg_height*.1};
 
 			// var tree_root = {"x": 305, "y": 70};
 			var splits = Math.pow(2, factor_obj["factor_arr"].length)
-			var normalized_dataset = normalize(student_math,factor_obj["factor_arr"], special_fun);
+			var normalized_dataset = normalize(find_dataset[dataset_name],factor_obj["factor_arr"]);
 			if (created_tree == false){
 				tree_arr = createTreeBegin(ball_svg, tree_root, 300, 300, splits);
 				paths = createTreePath(ball_svg, tree_arr);
