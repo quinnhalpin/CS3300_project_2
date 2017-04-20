@@ -330,9 +330,10 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 	//attempt to move circles in a straight line with transitions
 	full_tree_arr =	tree_arr;
 	circles = svg.selectAll(".balls_bouncing").data(arr);
-	speed = .5;
+	// speed = .5;
 	speed_down = 1;
 	delay = 80;
+	// delay = 0;
 	pad = 20;
 	y_scale_perc = d3.scaleLinear().domain([0,100]).range([ball_svg_height-pad, tree_arr[0][2]["y2"] + 20]);
 	var y_scale_axis = d3.axisLeft(y_scale_perc).ticks(9).tickSize(9);
@@ -373,7 +374,7 @@ function initial_ball_transition(button){
 	category_update = category;
 	var category_at_start = category.reduce((a,x) => {a.push({num_units: x.num_units}); return a}, []);
 	if(button) button.attr("disabled", "disabled")
-
+	var is_checked = d3.select("#skip_animation").property("checked");	
 	nullspace = 0;
 	
 	circles.transition()
@@ -381,27 +382,25 @@ function initial_ball_transition(button){
 	.transition()
 	.on("start", () => running = true)
 	.duration(function(d){
-		//console.log(speed)
-		return 10/speed;
+		return (is_checked)? 0: 10/speed;
 	})
 	.delay(function(d,i) { 
-		//console.log(delay)
-		return delay*(n-i); })
+		return (is_checked)? 0: delay*(n-i); })
 	.attr("transform", (d) => "translate(" + root_loc.x + "," + root_loc.y + ")")
 	.transition()
 	.duration(function(d) {
-		return full_paths[d.data].node().getTotalLength()/speed})
+		return (is_checked)? 0: full_paths[d.data].node().getTotalLength()/speed})
   	.attrTween("transform", function(d){
   		return translateAlong(full_paths[d["data"]].node());})
 	.on("end", (d,i)=>{
 		category_update[d.data].num_units -= 1;
 		nullspace += 1;
-		make_large_pie(category_update, nullspace);
+		if (!is_checked) make_large_pie(category_update, nullspace);
 	})
   	.transition()
 	.duration(function(d){
 	l = full_tree_arr[0].length-1;
-	return dist(full_tree_arr[d["data"]][l]["x2"], full_tree_arr[d["data"]][l]["y2"],
+	return  (is_checked) ? 0: dist(full_tree_arr[d["data"]][l]["x2"], full_tree_arr[d["data"]][l]["y2"],
 	full_tree_arr[d["data"]][l]["x2"], y_scale_perc(d["count"]))/speed_down;
 	})
 	.attr("transform", (d,i) =>{
@@ -488,12 +487,10 @@ arc_mini = []
 called_boolean_pies = 0;
 function make_boolean_pies(ind, question){
 
-	// ball_svg.append("circle")
 	mini_pie_path[ind] = ball_svg.selectAll(".mini_pie_fraction_path_"+ind);
 	total_mini[ind] = function_data_arr[ind].reduce((a, x) => x + a, 0);
 	sofar_mini[ind] = 0;
 	cat_mini[ind] = function_data_arr[ind].map((x) => {
-		//console.log(x)
 		res_mini[ind] = {};
 		res_mini[ind].startAngle = sofar_mini[ind];
 		res_mini[ind].endAngle = sofar_mini[ind] + x * 2 * Math.PI / total_mini[ind];
