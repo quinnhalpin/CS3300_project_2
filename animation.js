@@ -110,7 +110,8 @@ function createTree(svg_id,root_loc, height, width, lower_bound, upper_bound, sp
 		.attr("x2", root_loc.x - width/2)
 		.attr("y2", root_loc.y + height/4 - 7)
 		.style("stroke-width", "7px")
-		.style("stroke", "#C1C389");
+		//.style("stroke", "#C1C389");
+		.style("stroke", "#03C03C");
 
 		setClasses(long_l, lower_bound, middle);
 		
@@ -135,7 +136,8 @@ function createTree(svg_id,root_loc, height, width, lower_bound, upper_bound, sp
 		.attr("x2", root_loc.x + width/2)
 		.attr("y2", root_loc.y + height/4 - 7)
 		.style("stroke-width", "7px")
-		.style("stroke", "#BB7980");
+		//.style("stroke", "#BB7980");
+		.style("stroke", "#FF6961");
 
 		setClasses(long_r, median, upper_bound)
 
