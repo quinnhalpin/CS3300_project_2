@@ -305,6 +305,7 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 	var y_scale_axis = d3.axisLeft(y_scale_perc).ticks(9).tickSize(9);
 	svg.append("g").attr("class", "axis_class").style("font", "10px times")
       	.call(y_scale_axis).attr("transform","translate(70,0)");	
+
 	var toppy = svg.append("path").attr("d", "M 205 60 L " + root_loc.x + " " + root_loc.y);
 
 	circles = circles.enter().append("circle").attr("class", "balls_bouncing")

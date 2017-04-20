@@ -9,15 +9,15 @@
 
 .step {
   margin-bottom: 200px;
-  font-family: "TiemposTextWeb-Regular","Georgia";
+  font-family: "TiemposTextWeb-Regular","Verdana";
   font-size: 16px;
   line-height: 23px;
   color: #767678;
 }
 .tool_bar{
-  width: 120px;
+  width: 200px;
   top:50;
-  left: 150;   
+  left: 80;   
   margin-left: 40px;
   position:fixed;
   float: left;
@@ -31,7 +31,7 @@
   color: #262626;
 }
 
-body { font-family: 'Alegreya Sans', Calibri, sans-serif; background-color: #F1EBDF;}
+body { font-family: 'Verdana', Calibri, sans-serif; background-color: #F1EBDF;}
 .words {width : 700px;}
 .mini_pie_text{
   text-anchor:middle;
