@@ -139,7 +139,7 @@
 
 	function parseInternationalStudents(row) {
 		row.gender = (row.gender=="M") ? 1:0;
-		row.StudentAbsenceDays = (row.StudentAbsenceDays > 7) ? 1: 0;
+		row.StudentAbsenceDays = (row.StudentAbsenceDays == "Above-7") ? 1: 0;
 		row.ParentschoolSatisfaction = row.ParentschoolSatisfaction== "Good" ? 1: 0;
 		return row;
 	}
@@ -202,11 +202,11 @@
     	//special param is an array by category index and holds % yes for that category
     	normalized_dataset = {"ball_data": [], "special_param": []};
     	dataset.forEach(function(p){
-    		// console.log(chosen_functions)
+    		// //console.log(chosen_functions)
     		var cat_ind = determineCategory(chosen_functions, p);
-    		// console.log(p)
-    		// console.log("in dataset finder")
-    		// console.log(cat_ind)
+    		// //console.log(p)
+    		// //console.log("in dataset finder")
+    		// //console.log(cat_ind)
     		//add to the number of people in this category
     		category[cat_ind].num_units += 1;
     	})
@@ -411,19 +411,19 @@
 			add_selector_values(temp_dataset_selectors, Object.keys(temp_dataset_questions),0);
 		});
 		// d3.selectAll("select").on("change", see_tree);
-		d3.select("#see_tree_button").on("click", see_tree);
+		see_tree_button = d3.select("#see_tree_button").on("click", see_tree);
 		
 		function see_tree(e){
 			called_see_tree = true;
 			factor_obj ={"factor_arr": [], "questions_arr":[], "shortened_arr": []};
 			var funct, shorten_q, question;
-			// console.log(questions_data);
+			// //console.log(questions_data);
 			var dataset_name = select_dataset.property("value");
-			console.log(dataset_name)
+			//console.log(dataset_name)
 
 			var curr_dataset_object = questions_data_dict[databases[dataset_name]];
-			console.log("dataset_choice"+ dataset_name)
-			// console.log("DATA CHOICE IS HERE");
+			//console.log("dataset_choice"+ dataset_name)
+			// //console.log("DATA CHOICE IS HERE");
 			// if (dataset_choice == "International students data"){
 			// 	questions_data = questions_data_int;
 			// }
@@ -440,12 +440,12 @@
 
 			all_selectors.forEach(function(selector){
 				question = selector.property("value");
-				console.log("question" + question);
+				//console.log("question" + question);
 				factor_obj["factor_arr"].push(curr_dataset_object[question][0]);
 				factor_obj["questions_arr"].push(question);
 				factor_obj["shortened_arr"].push(curr_dataset_object[question][1]);
 			})
-			console.log(all_selectors)
+			//console.log(all_selectors)
 			// special_fun = questions_data[special_selector.property("value")][0];
 			// special_short_quest = questions_data[special_selector.property("value")][1];
 			tree_root = {"x": ball_svg_width/2, "y": ball_svg_height*.1};
@@ -466,7 +466,7 @@
 			// spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, tree_root,student_math, factor_obj, paths);
  			addStrings(ball_svg_height, ball_svg_width, tree_arr, ball_svg, factor_obj["questions_arr"]);		
 			created_tree = true
-			initial_ball_transition();
+			initial_ball_transition(d3.select("#see_tree_button"));
 		}
 
 		

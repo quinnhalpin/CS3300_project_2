@@ -10,6 +10,7 @@ var pad;
 var full_paths;
 var y_scale_perc;
 var full_tree_arr;
+var running = false;
 function determineTreeBox(person, function_arr){
 	//take multiple boolean functions and use them to determine path of person
 	//assume f1 is top tree level, ... fn is bottom
@@ -55,7 +56,6 @@ function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_lo
 
 	// var student_results = full_data.map(function(x){
 	// 	var category = determineTreeBox(x, factor_obj.factor_arr);
-	// 	// console.log(category);
 
 	// 	// normalized_dataset = {"ball_data": [], "special_param": []};
 	// 	attrib_intersect[category] = attrib_intersect[category] ? attrib_intersect[category] + 1 : 1;
@@ -63,15 +63,14 @@ function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_lo
 	// 	circle_data.push({data:, count:attrib_intersect[category]});
 	// 	return category;
 	// });
-	// console.log("Grades per category ")
-	// console.log( grades_per_category)
+	// //console.log( grades_per_category)
 	var pad = 20;
 	x_scale = d3.scaleLinear().domain([4*d3.min(results), 4*d3.max(results)])
 			.range([pad,ball_svg_width - pad]);
 
 	var circles = ball_svg.selectAll("circle").data(circle_data.reverse());
 	var i = 0;
-	// console.log(factor_obj)
+	// //console.log(factor_obj)
 	moveCircle(circle_data, ball_svg_width, ball_svg_height, tree_arr, ball_svg, full_data["ball_data"].length, root_loc, paths, factor_obj);
 	return tree_arr;	
 }
@@ -251,21 +250,20 @@ function showSign(svg, data, paths, tree_arr, factor_obj, fromPath){
 		.attr("fill", "#F4EDE3")
 		.attr("stroke", "black")
 		.attr("width", 150)
-		.attr("height", 100)
-		.transition()
-		.duration(500)
-		.attrTween("opacity", d3.interpolate(0, 1));
+		.attr("height", 100);
 	var text = svg.append("text").style("font", "20px times")
 		.attr("id", "rect_text")
 		.html("")
 		.style("font", "14px times")
 		.attr("y", function() { return tree_arr[data][l]["y2"] + 70});
+
+	var max_width = 100;
 	var d = data;
 	for (var i = 0; i < factor_obj.shortened_arr.length; i++){
 		//begin at first question
 		var opp_i = factor_obj.shortened_arr.length - 1 - i; 
 
-		text.append("tspan")
+		var w = text.append("tspan")
 			.attr("dy", 20)
 			.attr("x",function(){
 				return (after_transition) ? 480 :tree_arr[data][l]["x2"] - 40;})
@@ -278,15 +276,18 @@ function showSign(svg, data, paths, tree_arr, factor_obj, fromPath){
 					factor_str  += ": Yes";
 				}
 				return factor_str;
-			});		
+			});	
+		max_width = Math.max(max_width,w.node().getBBox().width + 20);	
 	}
+	//console.log(max_width)
+	rect.attr("width", max_width);;
 	text.append("tspan")
 		.attr("dy", 20)
 		.attr("x",function(){
 			return (after_transition) ? 480 :tree_arr[data][l]["x2"] - 40;})
 		.text(
 			(category[data].final_num)+ "%");		
-	svg.selectAll("balls_bouncing")
+	svg.selectAll(".balls_bouncing")
 	.attr("opacity", function(d){
 		return  (d.data == data) ? 1 : .1;
 	});
@@ -298,7 +299,7 @@ function hideSign(svg, data, paths){
 
 	d3.select("#show_rect").remove();
 	d3.select("#rect_text").remove();
-	svg.selectAll("balls_bouncing").attr("opacity", function(){return (after_transition == true) ? 1:1});
+	svg.selectAll(".balls_bouncing").attr("opacity", function(){return (after_transition == true) ? 1:1});
 	d3.selectAll(".estimated").attr("opacity",1);
 	for (var i = 0; i < paths.length; i++){
 		paths[i].style("opacity", 0).style("stroke-opacity",0);;
@@ -337,13 +338,13 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 			hideSign(svg, c.data, paths);
 		})
 		.style("fill", function(c, i) {
-			console.log(category[c.data].color)
+			//console.log(category[c.data].color)
 			return color(category[c.data].color);})
 
 }
 
 
-function initial_ball_transition(){
+function initial_ball_transition(button){
 	//times balls so that they are going out one by one on time
 	//and move down tree
 
@@ -353,19 +354,23 @@ function initial_ball_transition(){
 	pad = 20;
 	// root_loc = {"x": 305, "y": 70};
 	root_loc = {"x": ball_svg_width/2, "y": ball_svg_height*.1};
-
 	n = 100;
 	category_update = category;
+	var category_at_start = category.reduce((a,x) => {a.push({num_units: x.num_units}); return a}, []);
+	if(button) button.attr("disabled", "disabled")
+
 	nullspace = 0;
+	
 	circles.transition()
 	.attr("transform", (d) => "translate("+(root_loc.x - 1)+ ","+ (root_loc.y-15)+")")
 	.transition()
+	.on("start", () => running = true)
 	.duration(function(d){
-		console.log(speed)
+		//console.log(speed)
 		return 10/speed;
 	})
 	.delay(function(d,i) { 
-		console.log(delay)
+		//console.log(delay)
 		return delay*(n-i); })
 	.attr("transform", (d) => "translate(" + root_loc.x + "," + root_loc.y + ")")
 	.transition()
@@ -388,17 +393,23 @@ function initial_ball_transition(){
 			
 			return "translate("+tree_arr[d["data"]][l]["x2"]+","+(y_scale_perc(d["count"]))+")"
 		})
-		
+	.on("end", (d,i)=>{
+		if(i == 0 && button){
+			button.attr("disabled", null);
+			make_large_pie(category_at_start, 0, 1000)			
+		}
+	})
 }
 
 
-function make_large_pie( categories, nullspace){
+function make_large_pie( categories, nullspace, duration){
 	//make a large pie that will be based on data of selected dataset
 	// d3.selectAll("#pie_fraction_path").remove().exit();
-	// console.log(categories)
+	// //console.log(categories)
+	// console.log(nullspace)
 	pie_path = ball_svg.selectAll(".pie_fraction_path");
 	nullspace = nullspace || 0;
-	delay = delay || 0;
+	duration = duration || 15;
 
 	var total = categories.reduce((a, x) => x.num_units + a, 0) + nullspace;
 	var sofar = nullspace * 2 * Math.PI / total;
@@ -410,7 +421,7 @@ function make_large_pie( categories, nullspace){
 		return res;
 	}))
 
-	
+	// console.log(cat);
 	var radius = 100;
 	
 	var arc = d3.arc()
@@ -427,7 +438,7 @@ function make_large_pie( categories, nullspace){
 	pie_path.enter().append("path").attr("class", "pie_fraction_path")
     	.attr("fill", function(d, i) { 
     		if (i!=0){
-    			console.log(categories[i-1].color)	
+    			//console.log(categories[i-1].color)	
     		}
     		 return (i==0) ? '#dddddd' : categories[(i-1)].color; })
 	    .attr("id", function(d){ 
@@ -436,8 +447,10 @@ function make_large_pie( categories, nullspace){
 	    .attr("transform", "translate(" +(ball_svg_width *.9 )+","+ (ball_svg_height*1/5)+")")
 		.merge(pie_path)
 		.transition()
-		.delay(delay)
-        .duration(15)
+		.on("interrupt", () => {
+			console.log("yoo");
+		})
+        .duration(duration)
         .attrTween("d", arcTween);
 
 	pie_path.exit().remove();
@@ -465,7 +478,7 @@ function make_boolean_pies(ind, question){
 	total_mini[ind] = function_data_arr[ind].reduce((a, x) => x + a, 0);
 	sofar_mini[ind] = 0;
 	cat_mini[ind] = function_data_arr[ind].map((x) => {
-		console.log(x)
+		//console.log(x)
 		res_mini[ind] = {};
 		res_mini[ind].startAngle = sofar_mini[ind];
 		res_mini[ind].endAngle = sofar_mini[ind] + x * 2 * Math.PI / total_mini[ind];
@@ -487,7 +500,7 @@ function make_boolean_pies(ind, question){
 
 	mini_pie_path[ind].enter().append("path").attr("class", "mini_pie_fraction_path_"+ind + " mini_pie_fraction_path")
     	.attr("fill", function(d, i) { 
-    		console.log(tree_arr)
+    		//console.log(tree_arr)
     		return (i==0) ? 'green' : 'red'; })
 	    .attr("id", function(d){ 
 	      	return "pie_section_" + ind})
@@ -505,6 +518,7 @@ function make_boolean_pies(ind, question){
 	    text_for_mini_pie = ball_svg.append("text")
 	    .attr("class", "mini_pie_"+ind+"_text")
 	    .attr("class", "mini_pie_"+ind+"_text mini_pie_text")
+	    .attr("text_anchor","middle")
 	    .text(question)
 	    .style("font", "14px times")
 		.attr("x", ()=>{ 
