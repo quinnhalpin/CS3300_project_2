@@ -91,7 +91,6 @@ function createTree(svg_id,root_loc, height, width, lower_bound, upper_bound, sp
 		.attr("x2", root_loc.x - width/2)
 		.attr("y2", root_loc.y + height/4 - 7)
 		.style("stroke-width", "7px")
-		//.style("stroke", "#C1C389");
 		.style("stroke", "#03C03C");
 
 		setClasses(long_l, lower_bound, middle);
@@ -117,7 +116,6 @@ function createTree(svg_id,root_loc, height, width, lower_bound, upper_bound, sp
 		.attr("x2", root_loc.x + width/2)
 		.attr("y2", root_loc.y + height/4 - 7)
 		.style("stroke-width", "7px")
-		//.style("stroke", "#BB7980");
 		.style("stroke", "#FF6961");
 
 		setClasses(long_r, median, upper_bound)
@@ -134,21 +132,6 @@ function createTree(svg_id,root_loc, height, width, lower_bound, upper_bound, sp
 
 		setClasses(short_r, median, upper_bound)
         
-        // var nodeAdd = svg_id.append("circle")
-        // .attr("id", "tree" + 0 + "-" + half_splits)
-        // .attr("cx", root_loc.x - width/2)
-        // .attr("cy", root_loc.y + height/4 - 5)
-        // .attr("r", 8)
-        // .style("fill", "#000000")
-        // .style("z-index", 20);
-        // var nodeAdd2 = svg_id.append("circle")
-        // .attr("id", "tree"+ median + "-" + full_splits)
-        // .attr("cx", root_loc.x + width/2)
-        // .attr("cy", root_loc.y + height/4 - 5)
-        // .attr("r", 8)
-        // .style("fill", "#000000")
-        // .style("z-index", 20);
-
 		if (tree_struct != undefined){
 			var tree_structL = tree_struct.concat([
 			{"x1":root_loc.x + 1, 
@@ -496,7 +479,7 @@ function make_boolean_pies(ind, question){
 	mini_pie_path[ind].enter().append("path").attr("class", "mini_pie_fraction_path_"+ind + " mini_pie_fraction_path")
     	.attr("fill", function(d, i) { 
     		//console.log(tree_arr)
-    		return (i==0) ? '#C1C389' : '#BB7980'; })
+    		return (i==0) ? "#03C03C" : "#FF6961"; })
 	    .attr("id", function(d){ 
 	      	return "pie_section_" + ind})
 	    .each(function(d) {this._current_angle = d; }) //store initial angles
