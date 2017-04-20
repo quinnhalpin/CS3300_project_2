@@ -338,8 +338,7 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 			hideSign(svg, c.data, paths);
 		})
 		.style("fill", function(c, i) {
-			//console.log(category[c.data].color)
-			return color(category[c.data].color);})
+			return category[c.data].color});
 
 }
 
@@ -440,7 +439,7 @@ function make_large_pie( categories, nullspace, duration){
     		if (i!=0){
     			//console.log(categories[i-1].color)	
     		}
-    		 return (i==0) ? '#dddddd' : categories[(i-1)].color; })
+    		 return (i==0) ? '#dddddd' : category[(i-1)].color; })
 	    .attr("id", function(d){ 
 	      	return "pie_section_" + d.index})
 	    .each(function(d) {this._current_angle = d; }) //store initial angles
