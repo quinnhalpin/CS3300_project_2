@@ -374,7 +374,7 @@
 		
 		
 		var curr_hue = 1;
-		d3.select("#user_input").append("text").style("font", "17px times")
+		d3.select("#user_input").append("text").style("font", "30px times")
 		.text("Speed");
 
 		var questions_data_dict = {"math":{
@@ -490,11 +490,43 @@
 			addStrings(ball_svg_height, ball_svg_width, tree_arr, ball_svg, factor_obj["questions_arr"]);		
 			created_tree = true
 			initial_ball_transition(d3.select("#see_tree_button"));
-		}
 
-		
- 		
+			ball_svg.append("rect")
+				.attr("height", "35")
+				.attr("width", "800")
+				.attr("fill", "#F1EBDF")
+
+			ball_svg.append("text")
+				.attr("transform", "translate("+ball_svg_width/2+",26)")
+				.attr("fill", "black")
+				.style("font-family", "Verdana")
+				.style("font-size", "30")
+				.style("text-anchor", "middle")
+				.style("text-align", "center")
+				.text(dataset_name);
+			
+			ball_svg.append("text")
+				.attr("transform", "translate("+ball_svg_width/2+",600)")
+				.attr("fill", "black")
+				.style("font-family", "Verdana")
+				.style("font-size", "18")
+				.style("text-anchor", "middle")
+				.style("text-align", "center")
+				.text("Student distribution");
+			
+			ball_svg.append("text")
+				.attr("transform", "translate(100,640)")
+				.attr("fill", "black")
+				.style("font-family", "Verdana")
+				.style("font-size", "18")
+				.style("text-anchor", "end")
+				.text("Percent of Students")
+				.attr('x', '-320')
+				.attr('y', '30')
+				.attr('transform', 'rotate(-90)')
+
  	}	
+ }
 </script>
 </body>
 </section>
