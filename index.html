@@ -85,8 +85,9 @@
 		Third Boolean Variable<br>
 		<select id = "selector_3">
 		</select><br><br>
-		<button id="see_tree_button">See Tree</button><br><br>
-                </section>
+		<button id="see_tree_button">See Tree</button>
+		<button id="skip_animation">Skip Animation</button><br><br>
+      </section>
       <section class="step">
         <div class="title">Step</div>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis, eros sit amet pellentesque consectetur, enim sapien tincidunt ante, a finibus elit libero non ex. Suspendisse potenti.
@@ -128,26 +129,6 @@
 	<div id = "ball_animation"></div>
 
 	<div id = "text_for_scroll">
-		<!-- <div id = "text_1">
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lobortis, eros sit amet pellentesque consectetur, enim sapien tincidunt ante, a finibus elit libero non ex. Suspendisse potenti. Aenean consectetur molestie fringilla. In hac habitasse platea dictumst. Donec consectetur risus mi, in consectetur mi vestibulum nec. Etiam cursus, libero ut vulputate malesuada, odio tortor egestas est, egestas tempor diam velit vel ante. Quisque enim felis, porttitor at libero eget, imperdiet auctor mauris. Aliquam congue, turpis a mattis pellentesque, libero nulla porttitor neque, non vehicula leo diam sed lacus. Fusce tincidunt egestas malesuada. Morbi scelerisque posuere sem nec bibendum. Donec euismod dui eu lacinia tempus. Aliquam dictum nulla sed elit suscipit commodo. Nullam lobortis feugiat aliquet. Praesent nec mattis neque. Phasellus ultrices, turpis quis congue porta, purus enim eleifend dui, et pulvinar est magna id quam. Donec eu arcu lobortis, euismod massa et, gravida leo.
-		</div>
-		<div id = "text_2">
-		Nullam sit amet quam risus. Interdum et malesuada fames ac ante ipsum primis in faucibus. Phasellus vulputate cursus enim quis tempus. Morbi interdum enim tristique neque dictum, eu fringilla nunc gravida. Aliquam in nisi id sem iaculis sollicitudin eu non sapien. Maecenas nec massa eget odio gravida sagittis fringilla quis nunc. Maecenas felis lectus, interdum ut tempus vulputate, scelerisque ac est. Curabitur ultricies interdum lectus sit amet pharetra.
-		</div>
-		<div id = "text_3">
-
-		Donec eget dictum odio, ac lobortis quam. Proin molestie erat a sapien semper volutpat. Praesent tristique congue est, vel blandit ipsum tristique vitae. Suspendisse sed neque erat. Pellentesque maximus laoreet laoreet. Maecenas et arcu lacus. Fusce at erat eu erat pellentesque iaculis eu at nulla. Nunc felis ex, eleifend id luctus nec, ultricies et ligula.
-		</div>
-		<div id = "text_4">
-
-		Proin magna dolor, semper eu ante tempor, viverra egestas felis. Fusce consectetur mauris turpis, vel vehicula ipsum elementum sed. Duis et mauris non elit posuere ornare. Curabitur auctor libero ut leo sagittis, quis auctor risus consectetur. Mauris sagittis tincidunt risus, sed lobortis nunc convallis id. Aliquam erat volutpat. Fusce sed metus et tellus ultricies facilisis. Cras in justo a justo faucibus faucibus quis eget tellus.
-		</div>
-		<div id = "text_5">
-		In hac habitasse platea dictumst. Praesent eu libero vitae eros convallis laoreet at id leo. Interdum et malesuada fames ac ante ipsum primis in faucibus. Cras ut orci eu dolor feugiat euismod non vitae odio. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer cursus porttitor gravida. Pellentesque ultricies erat nunc, eu accumsan nibh euismod vel. Cras eleifend viverra dolor, sit amet tincidunt lectus varius sit amet. Fusce vehicula elit vitae mi condimentum, id facilisis lacus iaculis. In accumsan quis urna sed finibus. Nullam ac lobortis tellus, nec ultricies justo. Praesent rutrum nec magna auctor ultrices. Integer sodales erat interdum congue sagittis. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Curabitur arcu diam, dictum sed quam quis, commodo tincidunt orci. Praesent ultricies libero vel venenatis vulputate.
-		</div>
-		<div id = "text_6">
-		Maecenas varius quam efficitur, ullamcorper dui ac, finibus enim. Suspendisse convallis vulputate massa, non cursus dui malesuada ut. Nunc vel augue vestibulum, vulputate magna ut, interdum ex. Nam laoreet vulputate nisl. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Suspendisse egestas, ligula tempor faucibus vehicula, nisl nisi venenatis diam, interdum lobortis nibh libero in ante. Vestibulum vitae massa lorem. Donec egestas volutpat diam sit amet ullamcorper. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Fusce ligula massa, ultricies et elementum eget, scelerisque et augue. Donec eu tristique nisi. Donec odio neque, fermentum eu massa et, dapibus fermentum massa. Donec auctor fringilla turpis ac pharetra. Cras gravida, neque auctor imperdiet iaculis, nulla mi sagittis ante, vitae tempus elit metus vel dui. Duis quis molestie mi, a tempor magna.
-		</div> -->
 	</div>
 </div> 
 </div>
@@ -456,26 +437,15 @@
 		var all_selectors = [selector_1, selector_2, selector_3]
 		var temp_arr_selectors = [selector_1, selector_2, selector_3];
 		var temp_questions_data = questions_data_dict["math"];
-		// var temp_questions_data = data_dict[databases[select_dataset.property("value")]];
 		var temp_dataset_questions = databases;
 		var temp_dataset_selectors = [select_dataset];
-		add_selector_values(temp_arr_selectors, Object.keys(temp_questions_data))
-		add_selector_values(temp_dataset_selectors, Object.keys(temp_dataset_questions))
-		make_venn_diagram();
+		add_selector_values(temp_arr_selectors, Object.keys(temp_questions_data));
+		add_selector_values(temp_dataset_selectors, Object.keys(temp_dataset_questions));
 		var created_tree = false;
 		var paths;
 		
-		//trigger tree for page load
 		if (!called_see_tree) see_tree();
 
-
-
-
-
-		// else{
-		// 	d3.select(circle).transition();
-		// }
-		//trigger tree for any values selectors changing
 		d3.selectAll("#dataset").on("change", ()=>{
 			var curr_dataset = select_dataset.property("value")
 			var curr_dataset_object = questions_data_dict[databases[curr_dataset]]
@@ -490,26 +460,9 @@
 			called_see_tree = true;
 			factor_obj ={"factor_arr": [], "questions_arr":[], "shortened_arr": []};
 			var funct, shorten_q, question;
-			// //console.log(questions_data);
 			var dataset_name = select_dataset.property("value");
-			//console.log(dataset_name)
 
 			var curr_dataset_object = questions_data_dict[databases[dataset_name]];
-			//console.log("dataset_choice"+ dataset_name)
-			// //console.log("DATA CHOICE IS HERE");
-			// if (dataset_choice == "International students data"){
-			// 	questions_data = questions_data_int;
-			// }
-			// if (dataset_choice == "High school student data in Portugal"){
-			// 	questions_data = questions_data_math;
-			// }
-
-			//var temp_questions_data = questions_data;
-			//var temp_dataset_questions = databases;
-			// var temp_dataset_selectors = [select_dataset];
-			// temp_questions_data = questions_data;
-			// add_selector_values(temp_arr_selectors, Object.keys(temp_questions_data), 0)
-			// add_selector_values(temp_dataset_selectors, Object.keys(temp_dataset_questions), 0)
 
 			all_selectors.forEach(function(selector){
 				question = selector.property("value");
@@ -518,9 +471,6 @@
 				factor_obj["questions_arr"].push(question);
 				factor_obj["shortened_arr"].push(curr_dataset_object[question][1]);
 			})
-			//console.log(all_selectors)
-			// special_fun = questions_data[special_selector.property("value")][0];
-			// special_short_quest = questions_data[special_selector.property("value")][1];
 			tree_root = {"x": ball_svg_width/2, "y": ball_svg_height*.1};
 
 			// var tree_root = {"x": 305, "y": 70};
@@ -535,9 +485,8 @@
 			make_boolean_pies(1, factor_obj["shortened_arr"][1]);
 			make_boolean_pies(2, factor_obj["shortened_arr"][2]);
 
-			spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, tree_root,normalized_dataset, factor_obj, paths);
-			// spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, tree_root,student_math, factor_obj, paths);
- 			addStrings(ball_svg_height, ball_svg_width, tree_arr, ball_svg, factor_obj["questions_arr"]);		
+			spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, tree_root,normalized_dataset, factor_obj, paths); 		
+			addStrings(ball_svg_height, ball_svg_width, tree_arr, ball_svg, factor_obj["questions_arr"]);		
 			created_tree = true
 			initial_ball_transition(d3.select("#see_tree_button"));
 		}

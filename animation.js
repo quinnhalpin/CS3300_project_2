@@ -555,14 +555,3 @@ function make_boolean_pies(ind, question){
 	}
 	called_boolean_pies += 1;
 }
-
-function make_venn_diagram(){
-	for (var venn_i = 0; venn_i < 3; venn_i++){
-		ball_svg.append("circle")
-		.attr("class", "venn_circle")
-		.attr("transform", "translate("+(50+18*venn_i)+","+ (90 - ((venn_i == 1) ? 30: 0))+")")
-		.attr("r", 40)
-		.attr("fill",()=> (venn_i==0) ? "cyan": (venn_i == 1)? "yellow": "magenta")
-		.attr("opacity", 0.7);
-	}
-}
