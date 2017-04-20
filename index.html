@@ -1,7 +1,6 @@
 <html>
 <head>
 <title>Decision Tree</title>
-<!-- <title>Elise Colbert (emc277), Jacob Gleberman (jhg279), Quinn Halpin (qmh4)</title> -->
 <link rel="stylesheet" type="text/css" href="style.css">
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
@@ -90,9 +89,10 @@
 <script type = "text/javascript" src = "scroll.js"></script>
 <script type = "text/javascript" src = "graph-scroll.js"></script>
 
+
 <script type="text/javascript">
 	var student_math = [];
-	var student_por = [];
+	var student_econ = [];
 	var student_int = [];
 	var tree_arr = [];
 	var paths;
@@ -152,11 +152,25 @@
 		return row;
 	}
 
+	function parseEconData(row) {
+		row.chemistcourse = Number(row.chemistcourse);
+		row.language = (row.language == "no") ? 0: 1;
+		row.econ_major = (row.major =="eco") ? 1:0;
+		row.other_social_major = (row.major == "oss") ? 1:0;
+		row.humanties_major = (row.major == "hum") ? 1:0;
+		row.natural_science_major = (row.major == "ns")? 1:0;
+		row.mathcourse = Number(row.mathcourse);
+		row.physiccourse = Number(row.physiccourse);
+		row.sat = Number(row.sat);
+		row.gender = (row.sex == "male") ? 1:0;
+		row.mathlevel = Number(row.mathlevel);
+		return row;
+	}
  	d3.queue()
         .defer(d3.csv, "student_grades/student-mat.csv", parseStudentRow)
-        .defer(d3.csv, "student_grades/student-por.csv", parseStudentRow)
         .defer(d3.csv, "xAPI-Edu-Data.csv", parseInternationalStudents)
         .defer(d3.csv, "Speed-Dating-Data.csv")
+        .defer(d3.csv, "econ.csv", parseEconData)
         .await(load_data);
     
     function createTreePath(svg, tree_arr){
@@ -251,11 +265,10 @@
     	
     }
 
- 	function load_data(error, math, portugal, international, speeddating){
+ 	function load_data(error, math, international, speeddating, econ_data){
  		student_math = math;
- 		student_por = portugal;
  		student_int = international;
- 		speed_dating = speeddating;
+ 		student_econ = econ_data;
  		ball_svg_height = 600;
 		ball_svg_width = 800;
 		
@@ -264,11 +277,11 @@
 		.attr("width", ball_svg_width);
 		find_dataset = {"High school student data in Portugal":student_math, 
 		"International students data": student_int, 
-		"Speed dating in Colombia": speed_dating};
+		"Econ Students in US":student_econ};
 		databases = {};
 		databases["High school student data in Portugal"] = "math";
 		databases["International students data"] = "int";
-		databases["Speed dating in Colombia"] = "dating";
+		databases["Econ Students in US"] = "econ";
 
 		function hasInternet(person){
 			return person.internet;
@@ -312,23 +325,53 @@
 		}
 
 		data_dict["int"] = [isMale, manyAbsences, parentsSatisfied, highGrades, lowGrades];
+		
+		//Students who took econ dataset functions
+		function econMajor(person){
+			return person.econ_major;
+		} 
+		function naturalScienceMajor(person){
+			return person.natural_science_major;
+		}
+		function socialScienceMajor(person){
+			return person.other_social_major;
+		}
+		function humanitiesMajor(person){
+			return person.humanties_major;
+		}
+		function satMathAbove600(person){
+			return (person.sat > 600) ? 1:0;
+		}
+		function satMathBelow500(person){
+			return (person.sat < 500) ? 1:0;
+		}
+		function satMathAbove700(person){
+			return (person.sat > 700) ? 1:0;
+		}
+		function took3MathCourses(person){
+			return (person.mathcourse == 3) ? 1:0;
+		}
 
-		//SPEEDDATING
-		function isMaleDate(person){
-			return Number(person.gender);
+		function took1MathCourses(person){
+			return (person.mathcourse == 1) ? 1:0;
 		}
-		function valuesRace(person){
-			return Number(person.imprace) >= 6;
-		}
-		function valuesReligion(person){
-			return Number(person.imprelig) >=6;
-		}
-		function datesFrequently(person){
-			//if a person goes on dates more than once a month
-			return Number(person.date) <=5;
+		function took2MathCourses(person){
+			return (person.mathcourse == 2) ? 1:0;
 		}
 
-		data_dict["dating"] = [isMaleDate, valuesRace, valuesReligion, datesFrequently];
+		function tookNoMathCourses(person){
+			return (person.mathcourse == 0) ? 1:0;
+		}
+		function took2ChemistryCourses(person){
+			return (person.chemistcourse == 2) ? 1:0;
+		}
+		function knowForeignLanguage(person){
+			return (person.language == 1) ? 1:0;
+		}
+		data_dict["econ"] = [isMale, econMajor, humanitiesMajor, naturalScienceMajor, socialScienceMajor,
+		satMathAbove600, satMathAbove700, satMathBelow500, took3MathCourses, 
+		took1MathCourses, took2MathCourses, tookNoMathCourses, took2ChemistryCourses, knowForeignLanguage];
+		
 		
 		var curr_hue = 1;
 		d3.select("#user_input").append("text").style("font", "17px times")
@@ -351,15 +394,23 @@
 			"Does the student get high grades?": [highGrades, "High grades"],
 			"Does the student get low grades?": [lowGrades, "Low grades"]
 		},
-
-		"dating":{
-			"Is the subject male?": [isMaleDate, "Male"],
-			"Does the participant prefer a partner who is the same race as them?": [valuesRace, "Values same race"],
-			"Does the participant prefer a partner who is the same religion as them?": [valuesReligion, "Values same religion"],
-			"Does the participant date more than once a month?": [datesFrequently, "Dates more than once a month"]
-		}}
-
-		// questions_data = questions_data_dict["math"];
+		"econ":{"Is the subject male?": [isMale, "Male"],
+			"Is the student an Econ Major?": [econMajor, "Econ Major"],
+			"Is the student an Humanities Major?": [humanitiesMajor, "Humanities Major"],
+			"Is the student a Natural Science Major?": [naturalScienceMajor, "Natural Science"],
+			"Is the student a Social Science major?": [socialScienceMajor, "Social Science"],
+			"SAT Math Above 600?": [satMathAbove600, "SAT MATH > 600"],
+			"SAT Math Above 700?": [satMathAbove700, "SAT MATH > 700"],
+			"SAT Math Below 500?": [satMathBelow500, "SAT MATH < 500"],
+			"Took 3 Math Courses?": [took3MathCourses, "3 Math Courses"],
+			"Took 1 Math Courses?": [took1MathCourses, "1 Math Courses"],
+			"Took 2 Math Courses?": [took2MathCourses, "2 Math Courses"],
+			"Took No Math Courses?": [tookNoMathCourses, "No Math Courses"],
+			"Took 2 Chemistry Courses?": [took2ChemistryCourses, "2 Chemistry Courses"],
+			"Proficent in a foreign language?": [knowForeignLanguage, "Know Foreign Language"]
+		}	
+		
+		}
 
 		d3.graphScroll()
 			.graph(d3.selectAll('#ball_svg'))
@@ -418,14 +469,12 @@
 
 			all_selectors.forEach(function(selector){
 				question = selector.property("value");
-				//console.log("question" + question);
 				factor_obj["factor_arr"].push(curr_dataset_object[question][0]);
 				factor_obj["questions_arr"].push(question);
 				factor_obj["shortened_arr"].push(curr_dataset_object[question][1]);
 			})
 			tree_root = {"x": ball_svg_width/2, "y": ball_svg_height*.1};
 
-			// var tree_root = {"x": 305, "y": 70};
 			var splits = Math.pow(2, factor_obj["factor_arr"].length)
 			var normalized_dataset = normalize(find_dataset[dataset_name],factor_obj["factor_arr"]);
 			if (created_tree == false){
@@ -448,3 +497,9 @@
  	}	
 </script>
 </body>
+</section>
+</div>
+</div>
+</div>
+</body>
+</html>

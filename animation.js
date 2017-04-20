@@ -384,9 +384,6 @@ function initial_ball_transition(button){
 
 function make_large_pie( categories, nullspace, duration){
 	//make a large pie that will be based on data of selected dataset
-	// d3.selectAll("#pie_fraction_path").remove().exit();
-	// //console.log(categories)
-	// console.log(nullspace)
 	pie_path = ball_svg.selectAll(".pie_fraction_path");
 	nullspace = nullspace || 0;
 	duration = duration || 15;
@@ -400,9 +397,8 @@ function make_large_pie( categories, nullspace, duration){
 		sofar = res.endAngle;
 		return res;
 	}))
-
-	// console.log(cat);
 	var radius = 100;
+
 	
 	var arc = d3.arc()
     .innerRadius(radius/2)
@@ -473,12 +469,10 @@ function make_boolean_pies(ind, question){
 	    .value(function(d) { 
 	    	return d; })
 	    .sort(null);
-
     mini_pie_path[ind] = mini_pie_path[ind].data(cat_mini[ind]);
 
 	mini_pie_path[ind].enter().append("path").attr("class", "mini_pie_fraction_path_"+ind + " mini_pie_fraction_path")
     	.attr("fill", function(d, i) { 
-    		//console.log(tree_arr)
     		return (i==0) ? "#03C03C" : "#FF6961"; })
 	    .attr("id", function(d){ 
 	      	return "pie_section_" + ind})
@@ -503,11 +497,21 @@ function make_boolean_pies(ind, question){
 			return tree_arr[0][ind].x1+ 1/2*(tree_arr[0][ind].x2-tree_arr[0][ind].x1) - 60;
 		})
 		.attr("y", tree_arr[0][ind].y1+ 1/2*(tree_arr[0][ind].y2-tree_arr[0][ind].y1) - 35 + ind*9);
+		ball_svg.append("text")
+	    .attr("class", "mini_pie_"+ind+"_text mini_pie_"+ind+"_text mini_pie_text pie_data_point" + ind)
+	    .attr("text_anchor","middle")
+	    .text(function_data_arr[ind][0])
+	    .style("font", "14px times")
+		.attr("x", ()=>{ 
+			return tree_arr[0][ind].x1+ 1/2*(tree_arr[0][ind].x2-tree_arr[0][ind].x1) - 60;
+		})
+		.attr("y", tree_arr[0][ind].y1+ 1/2*(tree_arr[0][ind].y2-tree_arr[0][ind].y1) - 5 + ind*9);
 	}
 	else{
-		class_text_name  = ".mini_pie_" + ind+"_text"
-		stuff = d3.selectAll(class_text_name)
+		class_text_name  = ".mini_pie_" + ind+"_text";
+		pie_data_name  = ".pie_data_point" + ind;
 		d3.selectAll(class_text_name).text(question)
+		d3.selectAll(pie_data_name).text(function_data_arr[ind][0])
 	}
 	function arcTween(a) {
 	  var i = d3.interpolate(this._current_angle, a);
