@@ -25,14 +25,14 @@ function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_lo
 	full_paths = paths;
 	outside_tree = tree_arr;
 	g_ball_svg = ball_svg;
-	var rect = ball_svg.append("rect")
-		.attr("x", tree_root.x - 5)
-		.attr("y", tree_root.y - 40)
-		.attr("id", "spout")
-		.attr("fill", "purple")
-		.attr("stroke", "black")
-		.attr("width", 10)
-		.attr("height", 25);
+	// var rect = ball_svg.append("rect")
+	// 	.attr("x", tree_root.x - 5)
+	// 	.attr("y", tree_root.y - 40)
+	// 	.attr("id", "spout")
+	// 	.attr("fill", "none")
+	// 	.attr("stroke", "black")
+	// 	.attr("width", 10)
+	// 	.attr("height", 25);
 	paths.forEach(function(path){
 		path.on("mouseover", function () {
 				data = Number(this.id.substring(this.id.indexOf("_") + 1))
@@ -53,17 +53,6 @@ function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_lo
 		return x;
 	})
 
-
-	// var student_results = full_data.map(function(x){
-	// 	var category = determineTreeBox(x, factor_obj.factor_arr);
-
-	// 	// normalized_dataset = {"ball_data": [], "special_param": []};
-	// 	attrib_intersect[category] = attrib_intersect[category] ? attrib_intersect[category] + 1 : 1;
-
-	// 	circle_data.push({data:, count:attrib_intersect[category]});
-	// 	return category;
-	// });
-	// //console.log( grades_per_category)
 	var pad = 20;
 	x_scale = d3.scaleLinear().domain([4*d3.min(results), 4*d3.max(results)])
 			.range([pad,ball_svg_width - pad]);
@@ -121,8 +110,8 @@ function createTree(svg_id,root_loc, height, width, lower_bound, upper_bound, sp
 		.attr("y1", root_loc.y + height/4 - 10)
 		.attr("x2", root_loc.x - width/2)
 		.attr("y2", root_loc.y + height/4 + 2)
-		.style("stroke-width", "7px")
-		.style("stroke", "#000000");
+		.style("stroke-width", "0px")
+		.style("stroke", "#C1C389");
         
         
 
@@ -148,25 +137,25 @@ function createTree(svg_id,root_loc, height, width, lower_bound, upper_bound, sp
 		.attr("y1", root_loc.y + height/4 - 10)
 		.attr("x2", root_loc.x + width/2)
 		.attr("y2", root_loc.y + height/4 + 2)
-		.style("stroke-width", "7px")
-		.style("stroke", "#000000");
+		.style("stroke-width", "0px")
+		.style("stroke", "#BB7980");
 
 		setClasses(short_r, median, upper_bound)
         
-        var nodeAdd = svg_id.append("circle")
-        .attr("id", "tree" + 0 + "-" + half_splits)
-        .attr("cx", root_loc.x - width/2)
-        .attr("cy", root_loc.y + height/4 - 5)
-        .attr("r", 8)
-        .style("fill", "#000000")
-        .style("z-index", 20);
-        var nodeAdd2 = svg_id.append("circle")
-        .attr("id", "tree"+ median + "-" + full_splits)
-        .attr("cx", root_loc.x + width/2)
-        .attr("cy", root_loc.y + height/4 - 5)
-        .attr("r", 8)
-        .style("fill", "#000000")
-        .style("z-index", 20);
+        // var nodeAdd = svg_id.append("circle")
+        // .attr("id", "tree" + 0 + "-" + half_splits)
+        // .attr("cx", root_loc.x - width/2)
+        // .attr("cy", root_loc.y + height/4 - 5)
+        // .attr("r", 8)
+        // .style("fill", "#000000")
+        // .style("z-index", 20);
+        // var nodeAdd2 = svg_id.append("circle")
+        // .attr("id", "tree"+ median + "-" + full_splits)
+        // .attr("cx", root_loc.x + width/2)
+        // .attr("cy", root_loc.y + height/4 - 5)
+        // .attr("r", 8)
+        // .style("fill", "#000000")
+        // .style("z-index", 20);
 
 		if (tree_struct != undefined){
 			var tree_structL = tree_struct.concat([
@@ -260,15 +249,15 @@ function showSign(svg, data, paths, tree_arr, factor_obj, fromPath){
 	//[showSign] shows the sign that will have the questions in it
 	l = tree_arr[0].length-1;
 
-	var rect = svg.append("rect")
-		.attr("id", "show_rect")
-		.attr("x", function(){
-			return (fromPath) ? tree_arr[data][l]["x2"] - 50: tree_arr[data][l]["x2"] -50;})
-		.attr("y", function() { return tree_arr[data][l]["y2"] + 70})
-		.attr("fill", "#F4EDE3")
-		.attr("stroke", "black")
-		.attr("width", 150)
-		.attr("height", 100);
+	// var rect = svg.append("rect")
+	// 	.attr("id", "show_rect")
+	// 	.attr("x", function(){
+	// 		return (fromPath) ? tree_arr[data][l]["x2"] - 50: tree_arr[data][l]["x2"] -50;})
+	// 	.attr("y", function() { return tree_arr[data][l]["y2"] + 70})
+	// 	.attr("fill", "#F4EDE3")
+	// 	.attr("stroke", "black")
+	// 	.attr("width", 150)
+	// 	.attr("height", 100);
 	var text = svg.append("text").style("font", "20px times")
 		.attr("id", "rect_text")
 		.html("")
@@ -389,16 +378,16 @@ function initial_ball_transition(button){
 	.delay(function(d,i) { 
 		return (is_checked)? 0: delay*(n-i); })
 	.attr("transform", (d) => "translate(" + root_loc.x + "," + root_loc.y + ")")
-	.transition()
-	.duration(function(d) {
-		return (is_checked)? 0: full_paths[d.data].node().getTotalLength()/speed})
-  	.attrTween("transform", function(d){
-  		return translateAlong(full_paths[d["data"]].node());})
 	.on("end", (d,i)=>{
 		category_update[d.data].num_units -= 1;
 		nullspace += 1;
 		if (!is_checked) make_large_pie(category_update, nullspace);
 	})
+	.transition()
+	.duration(function(d) {
+		return (is_checked)? 0: full_paths[d.data].node().getTotalLength()/speed})
+  	.attrTween("transform", function(d){
+  		return translateAlong(full_paths[d["data"]].node());})
   	.transition()
 	.duration(function(d){
 	l = full_tree_arr[0].length-1;
@@ -520,7 +509,7 @@ function make_boolean_pies(ind, question){
 	      	return "pie_section_" + ind})
 	    .each(function(d) {this._current_angle = d; }) //store initial angles
 	    .attr("transform", "translate(" +(tree_arr[0][ind].x1+ 1/2*(tree_arr[0][ind].x2-tree_arr[0][ind].x1) - 60)+","+
-	    (tree_arr[0][ind].y1+ 1/2*(tree_arr[0][ind].y2-tree_arr[0][ind].y1) )+")")
+	    (tree_arr[0][ind].y1+ 1/2*(tree_arr[0][ind].y2-tree_arr[0][ind].y1) - 10 + ind*9)+")")
 		.merge(mini_pie_path[ind])
 		.transition()
 		// .delay(delay)
@@ -536,9 +525,9 @@ function make_boolean_pies(ind, question){
 	    .text(question)
 	    .style("font", "14px times")
 		.attr("x", ()=>{ 
-			return tree_arr[0][ind].x1+ 1/2*(tree_arr[0][ind].x2-tree_arr[0][ind].x1) - 90;
+			return tree_arr[0][ind].x1+ 1/2*(tree_arr[0][ind].x2-tree_arr[0][ind].x1) - 60;
 		})
-		.attr("y", tree_arr[0][ind].y1+ 1/2*(tree_arr[0][ind].y2-tree_arr[0][ind].y1) - 20);
+		.attr("y", tree_arr[0][ind].y1+ 1/2*(tree_arr[0][ind].y2-tree_arr[0][ind].y1) - 35 + ind*9);
 	}
 	else{
 		class_text_name  = ".mini_pie_" + ind+"_text"
