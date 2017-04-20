@@ -1,0 +1,82 @@
+#sections {
+  position: relative;
+  display: inline-block;
+  width: 250px;
+  top: 0px;
+  z-index: 90;
+  padding-bottom: 200px;
+}
+
+.step {
+  margin-bottom: 200px;
+  font-family: "TiemposTextWeb-Regular","Georgia";
+  font-size: 16px;
+  line-height: 23px;
+  color: #767678;
+}
+
+#sections .title {
+  font-family: Arial,Helvetica,"san-serif";
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 2px;
+  color: #262626;
+  line-height: 1.2em;
+}
+
+svg { border: solid #ccc 1px; }
+body { font-family: 'Alegreya Sans', Calibri, sans-serif; background-color: #F1EBDF;}
+.words {width : 700px;}
+.mini_pie_text{
+	text-align:center;
+}
+
+#container{
+	overflow: auto;
+}
+
+#selector_div{
+	font-size: 12px;
+	float: right;
+	overflow: auto;
+}
+
+#text_for_scroll{
+	width: 200px;
+	float: right;
+	right: 140;
+}
+
+#ball_animation{
+	width: 500px;
+	top:50;
+	left: 20;	  
+	margin-left: 40px;
+	position:fixed;
+	float: left;
+	background-color: #F1EBDF;
+}
+
+.semi-square {
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
+   border-radius: 5px;
+}
+
+.styled-select {
+   border: 1px solid #ccc;
+   background: #FFFFFF;
+   font-size: 16px;
+   height: 34px;
+   width: 268px;
+}
+
+.styled-select select {
+   background: transparent;
+   border: none;
+   font-size: 14px;
+   height: 29px;
+   padding: 5px; /* If you add too much padding here, the options won't show in IE */
+   width: 268px;
+}
+

@@ -2,65 +2,10 @@
 <head>
 <title>Decision Tree</title>
 <!-- <title>Elise Colbert (emc277), Jacob Gleberman (jhg279), Quinn Halpin (qmh4)</title> -->
+<link rel="stylesheet" type="text/css" href="style.css">
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
 <style>
-    
-#sections {
-  position: relative;
-  display: inline-block;
-  width: 250px;
-  top: 0px;
-  z-index: 90;
-  padding-bottom: 200px;
-}
-
-.step {
-  margin-bottom: 200px;
-  font-family: "TiemposTextWeb-Regular","Georgia";
-  font-size: 16px;
-  line-height: 23px;
-  color: #767678;
-}
-
-#sections .title {
-  font-family: Arial,Helvetica,"san-serif";
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 2px;
-  color: #262626;
-  line-height: 1.2em;
-}
-    
-	svg { border: solid #ccc 1px; }
-	body { font-family: 'Alegreya Sans', Calibri, sans-serif; background-color: #F1EBDF;}
-	.words {width : 700px;}
-	.mini_pie_text{
-		text-align:center;
-	}
-	#container{
-	  overflow: auto;
-	}
-	#selector_div{
-	  font-size: 12px;
-	  float: right;
-	  overflow: auto;
-	}
-	#text_for_scroll{
-	  width: 200px;
-	  float: right;
-      right: 140;
-	}
-
-	#ball_animation{
-	  width: 500px;
-	  top:50;
-	  left: 20;
-	  margin-left: 40px;
-      position:fixed;
-      float: left;
-      background-color: #F1EBDF;
-	}
 
 </style>
 </head>
@@ -74,17 +19,25 @@
             <div class = "title">Data Selection</div>
             <div id = "selector_div">
 		Pick Dataset:<br>
-		<select id = "dataset">
-		</select><br><br>
-		First Boolean Variable:<br>
-		<select id = "selector_1">
-		</select><br><br>
-		Second Boolean Variable:<br>
-		<select id = "selector_2">
-		</select><br><br>
-		Third Boolean Variable<br>
-		<select id = "selector_3">
-		</select><br><br>
+		<div class="styled-select semi-square">
+			<select id = "dataset">
+			</select>
+		</div><br><br>
+			First Boolean Variable:<br>
+		<div class="styled-select semi-square">
+			<select id = "selector_1">
+			</select>
+		</div><br><br>
+			Second Boolean Variable:<br>
+		<div class="styled-select semi-square">	
+			<select id = "selector_2">
+			</select>
+		</div><br><br>
+			Third Boolean Variable<br>
+		<div class="styled-select semi-square">	
+			<select id = "selector_3">
+			</select>
+		</div><br><br>
 		<button id="see_tree_button">See Tree</button><br><br>
                 </section>
       <section class="step">
