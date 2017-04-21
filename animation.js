@@ -20,7 +20,7 @@ function determineTreeBox(person, function_arr){
 			return f(person)*Math.pow(2,ind)
 		}).reduce(function(x,acc){return acc+x});
 }
-function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_loc, full_data, factor_obj, paths){
+function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_loc, full_data, factor_obj){
 	//produce n balls from a spout that move down 
 	full_paths = paths;
 	outside_tree = tree_arr;
@@ -28,10 +28,10 @@ function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_lo
 	paths.forEach(function(path){
 		path.on("mouseover", function () {
 				data = Number(this.id.substring(this.id.indexOf("_") + 1))
-				showSign(ball_svg, data, paths, tree_arr, factor_obj, 1);
+				showSign(ball_svg, data, tree_arr, factor_obj, 1);
 			})
 			.on("mouseout", function () {
-				hideSign(ball_svg, data, paths);
+				hideSign(ball_svg);
 			})
 	})	
 	
@@ -51,7 +51,7 @@ function spoutBalls(ball_svg, ball_svg_width, ball_svg_height, tree_arr, root_lo
 
 	var circles = ball_svg.selectAll("circle").data(circle_data.reverse());
 	var i = 0;
-	moveCircle(circle_data, ball_svg_width, ball_svg_height, tree_arr, ball_svg, full_data["ball_data"].length, root_loc, paths, factor_obj);
+	moveCircle(circle_data, ball_svg_width, ball_svg_height, tree_arr, ball_svg, full_data["ball_data"].length, root_loc, factor_obj);
 	return tree_arr;	
 }
 
@@ -214,10 +214,14 @@ function determineCategories(data, total){
 }
 
 
-function showSign(svg, data, paths, tree_arr, factor_obj, fromPath){
+function showSign(svg, data, tree_arr, factor_obj, fromPath){
 	//[showSign] shows the sign that has the data about the category in it
+	//fromPath means is the scrolling coming from the path
+	d3.selectAll(".pie_fraction_path").attr("opacity", 0.2);
+	var selected_pie_fraction = "#pie_section_"+(data+2);
+	d3.selectAll(selected_pie_fraction).attr("opacity",1);
 	l = tree_arr[0].length-1;
-
+	if (tree_arr[data] == undefined) return;
 	var rect = svg.append("rect")
 		.attr("id", "show_rect")
 		.attr("x", function(){
@@ -269,9 +273,13 @@ function showSign(svg, data, paths, tree_arr, factor_obj, fromPath){
 	d3.selectAll(".estimated").attr("opacity",0.1);
 	data_str = ".p" + data;
 	d3.selectAll(data_str).attr("opacity",1);
+	//make all sections of circle opaque except selected
+	
 }
-function hideSign(svg, data, paths){
-	//[hideSign] hides the rect that displays info about category
+function hideSign(svg){
+	//[hideSign] hides the rect that displays info about category and 
+	//various other aspects like portions of pie and paths on the tree
+	d3.selectAll(".pie_fraction_path").attr("opacity",1);
 	d3.select("#show_rect").remove();
 	d3.select("#rect_text").remove();
 	svg.selectAll(".balls_bouncing").attr("opacity", function(){return (after_transition == true) ? 1:1});
@@ -281,7 +289,7 @@ function hideSign(svg, data, paths){
 	} 
 }
 
-function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root_loc, paths, factor_obj){
+function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root_loc, factor_obj){
 	/*[moveCircle] moves all of the circles to the starting point and initializes
 	ball with right color*/
 	svg.selectAll(".balls_bouncing").remove().exit();
@@ -308,10 +316,10 @@ function moveCircle(arr, ball_svg_height, ball_svg_width, tree_arr, svg, n, root
 			return c.data;
 		})
 		.on("mouseover", function (c) {
-			showSign(svg, c.data, paths, tree_arr, factor_obj,0);
+			showSign(svg, c.data, tree_arr, factor_obj,0);
 		})
 		.on("mouseout", function (c) {
-			hideSign(svg, c.data, paths);
+			hideSign(svg);
 		})
 		.style("fill", function(c, i) {
 			return category[c.data].color});
@@ -407,14 +415,18 @@ function make_large_pie( categories, nullspace, duration){
 	pie_path.enter().append("path").attr("class", "pie_fraction_path")
     	.attr("fill", function(d, i) {
     		 return (i==0) ? '#dddddd' : category[(i-1)].color; })
-	    .attr("id", function(d){ 
-	      	return "pie_section_" + d.index})
+	    .attr("id", function(d,i){ 
+	      	return "pie_section_" + (i+1)})
 	    .each(function(d) {this._current_angle = d; }) //store initial angles
 	    .attr("transform", "translate(" +(ball_svg_width *.9 )+","+ (ball_svg_height*1/5)+")")
 		.merge(pie_path)
-		.transition()
-		.on("interrupt", () => {
+		.on("mouseover", function (d,i) {
+			showSign(ball_svg, i-1, tree_arr, factor_obj, 0);
 		})
+		.on("mouseout", function (d,i) {
+			hideSign(ball_svg);
+		})
+		.transition()
         .duration(duration)
         .attrTween("d", arcTween);
 

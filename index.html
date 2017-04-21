@@ -4,19 +4,16 @@
 <link rel="stylesheet" type="text/css" href="style.css">
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
-<style>
-
-</style>
 </head>
+
 <body>
 
-	
-</div><div id = "container">
-    <div id = "text_for_scroll">
+<div id = "container">
+    <div id = "side_bar">
         <div id='sections'>
-    <section class = "tool_bar">
-            <div class = "title">Data Selection</div>
-            <div id = "selector_div">
+    	<section class = "tool_bar">
+        <div class = "title">Data Selection</div>
+        <div id = "selector_div">
 		Pick Dataset:<br>
 		<div class="styled-select semi-square">
 			<select id = "dataset">
@@ -36,35 +33,23 @@
 		<div class="styled-select semi-square">	
 			<select id = "selector_3">
 			</select>
+		<br><br>
 		</div><br><br>
+
 		<button id="see_tree_button">See Tree</button>
 		<input type ="checkbox" id="skip_animation">Skip Animation</button>
 		<br><br>
-   </section>
+		<br><br>
+		<div class = "hover_info"> 
+		Hover over visualization for more info.
+		</div>
+		</section>
 
-        <div class="title2">Key Insights</div><br>
-        <div class="title">Portuguese Student Data Insights</div>
-        <section class="step">
-        We found that there is a pretty even distribution amongst students who live in an urban environment and have internet no matter whether they do extracurriculars.
-      </section>
-      <section class="step">
-        <div class="title">Economics students in the US Data Insights</div>
-        If a student got above a 600 on the Math section of the SAT then they almost absolutely took math classes. We observed that there was actually a higher distribution of students who did better than a 600 on the SAT if that student was not an Econ Major. We could also observe that also no Social Science students did better than a 700 on the Math aspect of the SAT.
-      </section>
-      <section class="step">
-        <div class="title">International Student Data Insights</div>
-        If the students had many absences, they did not typically have high grades regardless of gender. We also observed an interesting phenomenon that for males with bad grades, they had the highest amount of parental satisfaction in the school whereas the percentage of women whose parents were satisfied was higher if they had high grades.
-      </section>
-    </div>
+    </div> 
 	</div>
 	<div id = "ball_animation"></div>
-
-	<div id = "text_for_scroll">
-	</div>
-</div> 
 </div>
 <script type = "text/javascript" src = "animation.js"></script>
-<script type = "text/javascript" src = "scroll.js"></script>
 <script type = "text/javascript" src = "dataset_functions.js"></script>
 
 
@@ -255,14 +240,14 @@
 		.attr("width", ball_svg_width);
 		
 		find_dataset = {
-			"High school student data in Portugal":student_math, 
-			"International students data": student_int, 
-			"Econ Students in US":student_econ
+			"High School Students in Portugal":student_math, 
+			"International Students": student_int, 
+			"Economic Students in US":student_econ
 		};
 		databases = {};
-		databases["High school student data in Portugal"] = "math";
-		databases["International students data"] = "int";
-		databases["Econ Students in US"] = "econ";
+		databases["High School Students in Portugal"] = "math";
+		databases["International Students"] = "int";
+		databases["Economic Students in US"] = "econ";
 		
 		data_dict["math"] = [hasInternet, hasRomance, isHigher, hasNursery, 
 		hasActivities, parentsApart, liveInCity];
@@ -310,20 +295,10 @@
 		//add dataset options to dataset selector
 		add_selector_values(temp_dataset_selectors, Object.keys(temp_dataset_questions));
 		var created_tree = false;
-		var paths;
 		
 		//on page load, make tree
 		if (!called_see_tree) see_tree();
 
-		//make bar chart label
-		ball_svg.append("text")
-				.attr("transform", "translate("+ball_svg_width/2+",600)")
-				.attr("fill", "black")
-				.style("font-family", "Verdana")
-				.style("font-size", "18")
-				.style("text-anchor", "middle")
-				.style("text-align", "center")
-				.text("Student distribution");
 		//make bar chart label	
 		ball_svg.append("text")
 			.attr("transform", "translate(100,640)")
@@ -383,7 +358,7 @@
 			make_boolean_pies(1, factor_obj["shortened_arr"][1]);
 			make_boolean_pies(2, factor_obj["shortened_arr"][2]);
 			//create balls that will move down tree based off of dataset
-			spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, tree_root,normalized_dataset, factor_obj, paths); 		
+			spoutBalls(ball_svg, ball_svg_height, ball_svg_width, tree_arr, tree_root,normalized_dataset, factor_obj); 		
 			created_tree = true
 			//transition balls down tree
 			initial_ball_transition(d3.select("#see_tree_button"));
@@ -397,15 +372,8 @@
 				.style("text-anchor", "middle")
 				.style("text-align", "center")
 				.text(dataset_name);
-			
-
  	}	
  }
 </script>
-</body>
-</section>
-</div>
-</div>
-</div>
 </body>
 </html>

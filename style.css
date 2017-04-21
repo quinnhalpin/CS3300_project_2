@@ -1,11 +1,3 @@
-#sections {
-  position: relative;
-  display: inline-block;
-  width: 250px;
-  top: 0px;
-  z-index: 90;
-  padding-bottom: 200px;
-}
 
 .step {
   margin-bottom: 200px;
@@ -39,6 +31,11 @@
   color: #262626;
 }
 
+.hover_info {
+  font-size: 16px;
+  color: #262626;
+}
+
 body { font-family: 'Verdana', Verdana, sans-serif; background-color: #F1EBDF;}
 .words {width : 700px;}
 .mini_pie_text{
@@ -55,10 +52,10 @@ body { font-family: 'Verdana', Verdana, sans-serif; background-color: #F1EBDF;}
 	overflow: auto;
 }
 
-#text_for_scroll{
-	width: 200px;
+#side_bar{
+	width: 180px;
 	float: right;
-	right: 140;
+	right: 180;
 }
 #ball_animation{
 	width: 500px;

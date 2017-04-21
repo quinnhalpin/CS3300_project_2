@@ -22,8 +22,6 @@ function parentsApart(person){
 function liveInCity(person){
 	return person.address == "U";
 }
-
-
 //INTERNATIONAL DATA FUNCTIONS
 function isMale(person){
 	return person.gender;
@@ -56,7 +54,7 @@ function humanitiesMajor(person){
 	return person.humanties_major;
 }
 function satMathAbove600(person){
-	return (person.sat > 600) ? 1:0;
+	return (person.sat >= 600) ? 1:0;
 }
 function satMathBelow500(person){
 	return (person.sat < 500) ? 1:0;
