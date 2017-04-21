@@ -490,11 +490,14 @@ function make_boolean_pies(ind, question){
 			return tree_arr[0][ind].x1+ 1/2*(tree_arr[0][ind].x2-tree_arr[0][ind].x1) - 60;
 		})
 		.attr("y", tree_arr[0][ind].y1+ 1/2*(tree_arr[0][ind].y2-tree_arr[0][ind].y1) - 35 + ind*9);
+
+		//add percent yes in each pie
 		ball_svg.append("text")
 	    .attr("class", "mini_pie_"+ind+"_text mini_pie_"+ind+"_text mini_pie_text pie_data_point" + ind)
 	    .attr("text_anchor","middle")
 	    .text(function_data_arr[ind][0])
 	    .style("font", "14px times")
+	    .style("fill", "#03C03C")
 		.attr("x", ()=>{ 
 			return tree_arr[0][ind].x1+ 1/2*(tree_arr[0][ind].x2-tree_arr[0][ind].x1) - 60;
 		})
