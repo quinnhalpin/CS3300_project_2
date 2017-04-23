@@ -1,3 +1,6 @@
 # CS3300_project_2
-Interactive Data Visualization that is a decision tree.
+Created a decision tree that looks at three boolean variables of a datset.
+
+![](IMG/Selection_356.png)
+![](IMG/Selection_358.png)
 
